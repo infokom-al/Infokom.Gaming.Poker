@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Apps/" />
+  <Folder Name="/Apps/CLI/">
+    <Project Path="Infokom.Gaming.Poker.Apps.CLI.ConsoleApp/Infokom.Gaming.Poker.Apps.CLI.ConsoleApp.csproj" Id="081b8c87-662a-4075-8e8f-ba55b5acd996" />
+  </Folder>
+  <Folder Name="/Apps/GUI/" />
+  <Folder Name="/Apps/WEB/" />
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Infokom.Gaming.Poker.Apps.CLI.TexasPocketEvaluation/Infokom.Gaming.Poker.Apps.CLI.TexasPocketEvaluation.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Infokom.Gaming.Poker.Texas/Infokom.Gaming.Poker.Texas.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Infokom.Gaming.Poker/Infokom.Gaming.Poker.csproj" Id="1634ef90-e113-4737-9ffe-347004bedab6" />
+  <Project Path="Infokom.Numerics/Infokom.Numerics.csproj" Id="14d6f72c-11e4-4114-b5d2-c614cf5891a9">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>

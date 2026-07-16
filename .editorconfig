@@ -1,0 +1,18 @@
+﻿[*.cs]
+
+# SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
+dotnet_diagnostic.SYSLIB1045.severity = silent
+
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = silent
+
+
+
+# IDE0009: Member access should be qualified.
+dotnet_diagnostic.IDE0009.severity = silent
+
+# IDE0021: Use expression body for constructor
+dotnet_diagnostic.IDE0021.severity = silent
+
+# IDE0046: Convert to conditional expression
+dotnet_diagnostic.IDE0046.severity = silent
