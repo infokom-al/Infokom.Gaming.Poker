@@ -10,6 +10,7 @@ using static System.Collections.Specialized.BitVector32;
 
 namespace Infokom.Gaming.Poker.Atomics
 {
+
 	[Flags]
 	public enum Suits : byte
 	{
@@ -21,7 +22,7 @@ namespace Infokom.Gaming.Poker.Atomics
 		All		= 0b_1111
 	}
 
-	public static class SuitsEnumExtensions
+	public static class SuitOptionExtensions
 	{
 		#region static extensions
 		extension(Suits)

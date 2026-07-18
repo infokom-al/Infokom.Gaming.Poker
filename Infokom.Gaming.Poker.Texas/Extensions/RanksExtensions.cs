@@ -1,13 +1,37 @@
 ﻿using Infokom.Gaming.Poker.Atomics;
 using Infokom.Numerics.Extensions;
+using Infokom.Numerics.Operators;
 
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
-namespace Holdem.Core.Extensions
+namespace Infokom.Gaming.Poker.Texas.Extensions
 {
 	public static class RanksExtensions
-	{	
+	{
+		public static bool TryGetStraight(Cards source, out Rank rank)
+		{
+			var mask = source.Ranks.ID;
+
+			if ((mask & 0b1000000001111) == 0b1000000001111)
+			{
+				rank = Rank.Five;
+				return true;
+			}
+
+			mask = mask & (mask << 1) & (mask << 2) & (mask << 3) & (mask << 4);
+
+			if (mask == 0)
+			{
+				rank = default;
+				return false;
+			}
+
+			var start = mask.BSR;
+
+			rank = Rank.Values[start + 4];
+
+			return true;
+		}
+
 
 		extension(Cards)
 		{
@@ -48,31 +72,6 @@ namespace Holdem.Core.Extensions
 				return 0;
 			}
 
-			public static bool TryGetStraight(Cards source, out Rank rank)
-			{
-				var mask = source.Ranks.ID;
-
-				if ((mask & 0b1000000001111) == 0b1000000001111)
-				{
-					rank = Rank.Five;
-					return true;
-				}
-
-				mask = mask & (mask << 1) & (mask << 2) & (mask << 3) & (mask << 4);
-
-				if (mask == 0)
-				{
-					rank = default;
-					return false;
-				}
-
-				var start = mask.UppBit;
-
-				rank = Rank.Values[start + 4];
-
-				return true;
-			}
-
 
 			/// <summary>
 			/// <see cref=get"/>
@@ -88,36 +87,9 @@ namespace Holdem.Core.Extensions
 				if (nc >= 5 || nd >= 5 || nh >= 5 || ns >= 5)
 				{
 					
-					
-
-
-					var r = Ranks.None;
-					if (nc >= 5)
-					{
-						r = (Ranks)Math.Max((ulong)r, (ulong)c);
-					}
-
-					if (nd >= 5)
-					{
-						r = (Ranks)Math.Max((ulong)r, (ulong)d);
-					}
-
-					if (nh >= 5)
-					{
-						r = (Ranks)Math.Max((ulong)r, (ulong)h);
-					}
-
-					if (ns >= 5)
-					{
-						r = (Ranks)Math.Max((ulong)r, (ulong)s);
-					}
-
-
-
 				}
 
-					var ss = (c & d & h & s).Count;
-				return ;
+				throw new NotImplementedException();
 			}
 		}
 

@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Infokom.Numerics\Infokom.Numerics.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Infokom.Gaming.Poker.Texas" />
+	</ItemGroup>
+
 </Project>

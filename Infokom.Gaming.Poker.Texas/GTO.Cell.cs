@@ -3,6 +3,7 @@ using Infokom.Gaming.Poker.Texas;
 
 using System.Collections;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Holdem.Core
 {
@@ -22,27 +23,41 @@ namespace Holdem.Core
 			}
 
 			public Rank Hi { get; }
+
 			public Rank Lo { get; }
 
 			public bool IsSuited { get; }
 
-			public bool IsPaired => this.Hi == this.Lo;
+			public bool IsPaired
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get
+				{
+					return this.Hi == this.Lo;
+				}
+			}
 
-			public bool IsEmpty => !this.Hi.IsKnown && !this.Lo.IsKnown;
-
-
+			public bool IsEmpty
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get
+				{
+					return !this.Hi.IsKnown && !this.Lo.IsKnown;
+				}
+			}
 
 			public (int Row, int Col) Index
 			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
 				get
 				{
 					if(!this.IsPaired)
 					{
 						if(!this.IsSuited)
-							return (Rank.IndexOf(this.Lo), Rank.IndexOf(this.Hi));
-						return (Rank.IndexOf(this.Hi), Rank.IndexOf(this.Lo));
+							return (this.Lo.Index, this.Hi.Index);
+						return (this.Hi.Index, this.Lo.Index);
 					}
-					return (Rank.IndexOf(this.Hi), Rank.IndexOf(this.Hi));
+					return (this.Lo.Index, this.Hi.Index);
 				}
 			}
 
@@ -51,7 +66,7 @@ namespace Holdem.Core
 			{
 				get
 				{
-					var (c1, c2, c3) = this.IsEmpty ? (' ',' ',' ') : (Rank.SymbolOf(this.Hi), Rank.SymbolOf(this.Lo), this.IsPaired ? ' ' : this.IsSuited ? 's' : 'o');
+					var (c1, c2, c3) = this.IsEmpty ? (' ',' ',' ') : (this.Hi.Symbol, this.Lo.Symbol, this.IsPaired ? ' ' : this.IsSuited ? 's' : 'o');
 					
 					return $"{c1}{c2}{c3}";
 				}

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
+using System.ComponentModel.DataAnnotations;
 
 namespace Holdem.Core.Internal
 {
@@ -235,7 +236,10 @@ namespace Holdem.Core.Internal
 									{
 										var pn = *(pPocket + n);
 
-										var rn = HAND.Evaluate(pn.Hi, pn.Lo, flop1, flop2, flop3, turn, river);
+
+										var hand = pn.Cards | Cards.Select(flop1, flop2, flop3, turn, river);
+
+										var rn = HAND.Evaluate(hand);
 
 										r[n] = rn;
 									}
@@ -295,7 +299,11 @@ namespace Holdem.Core.Internal
 								for (int n = 0; n < playersCount; n++)
 								{
 									var pn = players[n];
-									uint rn = HAND.Evaluate(pn.Hi, pn.Lo, flop1, flop2, flop3, turn, river);
+
+
+									var hand = pn.Cards | Cards.Select(flop1, flop2, flop3, turn, river);
+
+									uint rn = HAND.Evaluate(hand);
 									r[n] = rn;
 									if (rn > maxScore) maxScore = rn;
 								}

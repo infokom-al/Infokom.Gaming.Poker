@@ -22,10 +22,10 @@ namespace Infokom.Gaming.Poker.Texas
 	public readonly record struct Pocket
 	{
 		private readonly Cards _cards;
-
+			
 		private Pocket(Cards cards) => _cards = cards;
 
-		public Card this[int index] => index switch { 0 => _cards.LowerBound, 1 => _cards.UpperBound, _ => throw new IndexOutOfRangeException() };
+		public Card this[int index] => index switch { 0 => _cards.First, 1 => _cards.Last, _ => throw new IndexOutOfRangeException() };
 
 		public bool IsPaired => this.Ranks.Count == 1;
 
@@ -44,9 +44,9 @@ namespace Infokom.Gaming.Poker.Texas
 
 		public void Deconstruct(out Card hi, out Card lo)
 		{
-			hi = _cards.UpperBound;
+			hi = _cards.First;
+			lo = _cards.Last;
 
-			lo = _cards.LowerBound;
 
 			var d = hi.Rank.Index.CompareTo(lo.Rank.Index);
 

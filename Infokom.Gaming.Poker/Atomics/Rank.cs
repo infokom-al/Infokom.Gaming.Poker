@@ -34,47 +34,76 @@ namespace Infokom.Gaming.Poker.Atomics
 
 	public static class RankExtensions
 	{
-
-
 		private static readonly ImmutableArray<Rank> VALUES = [Rank.Two, Rank.Three, Rank.Four, Rank.Five, Rank.Six, Rank.Seven, Rank.Eight, Rank.Nine, Rank.Ten, Rank.Jack, Rank.Queen, Rank.King, Rank.Ace];
 
-		extension(Rank)
+		extension(Rank source)
 		{
-			public static ImmutableArray<Rank> Values => VALUES;
-
-			public static int Count => 13;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static ulong GetID(Rank rank) => rank switch
+			public ulong ID
 			{
-				Rank.Two		=> 0b0000000000001,
-				Rank.Three	=> 0b0000000000010,
-				Rank.Four		=> 0b0000000000100,
-				Rank.Five		=> 0b0000000001000,
-				Rank.Six		=> 0b0000000010000,
-				Rank.Seven	=> 0b0000000100000,
-				Rank.Eight	=> 0b0000001000000,
-				Rank.Nine		=> 0b0000010000000,
-				Rank.Ten		=> 0b0000100000000,
-				Rank.Jack		=> 0b0001000000000,
-				Rank.Queen	=> 0b0010000000000,
-				Rank.King		=> 0b0100000000000,
-				Rank.Ace		=> 0b1000000000000,
-				_			=> default
-			};
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source switch
+				{
+					Rank.Two => 0b0000000000001,
+					Rank.Three => 0b0000000000010,
+					Rank.Four => 0b0000000000100,
+					Rank.Five => 0b0000000001000,
+					Rank.Six => 0b0000000010000,
+					Rank.Seven => 0b0000000100000,
+					Rank.Eight => 0b0000001000000,
+					Rank.Nine => 0b0000010000000,
+					Rank.Ten => 0b0000100000000,
+					Rank.Jack => 0b0001000000000,
+					Rank.Queen => 0b0010000000000,
+					Rank.King => 0b0100000000000,
+					Rank.Ace => 0b1000000000000,
+					_ => default
+				};
+			}
 
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static int IndexOf(Rank source)
+			public int Index 
 			{
-				var id = Rank.GetID(source);
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source switch
+				{
+					Rank.Two		=> 0,
+					Rank.Three	=> 1,
+					Rank.Four		=> 2,
+					Rank.Five		=> 3,
+					Rank.Six		=> 4,
+					Rank.Seven	=> 5,
+					Rank.Eight	=> 6,
+					Rank.Nine		=> 7,
+					Rank.Ten		=> 8,
+					Rank.Jack		=> 9,
+					Rank.Queen	=> 10,
+					Rank.King		=> 11,
+					Rank.Ace		=> 12,
+					_			=> -1
+				};
+			}
 
-				return id == default ? -1 : BitOperations.TrailingZeroCount(id); 
+			public char Symbol
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => (char)source;
+			}
+
+			public bool IsKnown
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source.Index != -1;
 			}
 
 
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static char SymbolOf(Rank source) => (char)source;
+
+
+			public static ImmutableArray<Rank> Values => VALUES;
+
+			public static int Count
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => 13;
+			}
 
 
 			/// <summary>
@@ -85,37 +114,25 @@ namespace Infokom.Gaming.Poker.Atomics
 			/// <returns>True if <paramref name="target"/> is declared in <see cref="Rank"/> enumeration</returns>
 			public static bool TryConvertFrom(char symbol, out Rank target)
 			{
-				target = ((Rank)symbol).IsKnown ? (Rank)symbol : default;
+				target = (Rank)symbol;
 
+				if(target.IsKnown)
+				{
+					return true;
+				}
 
-				return target.IsKnown;
-			}
-		}
+				target = default;
 
-		extension(Rank source)
-		{
-			public ulong ID
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.GetID(source);
+				return false;
 			}
 
-			public int Index 
+			public static Rank ConvertFrom(char symbol)
 			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.IndexOf(source);
-			}
-
-			public char Symbol
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.SymbolOf(source);
-			}
-
-			public bool IsKnown
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => source.ID != default;
+				if(Rank.TryConvertFrom(symbol, out var rank))
+				{
+					return rank;		
+				}
+				throw new ArgumentOutOfRangeException(nameof(symbol), symbol, "");
 			}
 		}
 	}

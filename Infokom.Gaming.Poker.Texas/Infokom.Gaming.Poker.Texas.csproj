@@ -8,9 +8,7 @@
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
-	<ItemGroup>
-		<InternalsVisibleTo Include="Infokom.Gaming.Poker.Apps.CLI.TexasPocketEvaluation" />
-	</ItemGroup>
+	
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Infokom.Gaming.Poker\Infokom.Gaming.Poker.csproj" />

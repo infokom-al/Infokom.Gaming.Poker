@@ -1,113 +1,122 @@
-﻿using Infokom.Numerics.Extensions;
+﻿using Infokom.Numerics;
+using Infokom.Numerics.Extensions;
 
+using System.Collections;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 namespace Infokom.Gaming.Poker.Atomics
 {
+
 	public enum Cards : ulong
 	{
-		NONE		= 0b_0000000000000_0000000000000_0000000000000_0000000000000,
-		CLUBS	= 0b_0000000000000_0000000000000_0000000000000_1111111111111,
-		DIAMONDS	= 0b_0000000000000_0000000000000_1111111111111_0000000000000,
-		HEARTS	= 0b_0000000000000_1111111111111_0000000000000_0000000000000,
-		SPADES	= 0b_1111111111111_0000000000000_0000000000000_0000000000000,
-
-		TWOS		= 0b_0000000000001_0000000000001_0000000000001_0000000000001,
-		THREES	= 0b_0000000000010_0000000000010_0000000000010_0000000000010,
-		FOURS	= 0B_0000000000100_0000000000100_0000000000100_0000000000100,
-		FIVES	= 0B_0000000001000_0000000001000_0000000001000_0000000001000,
-		SIXES	= 0B_0000000010000_0000000010000_0000000010000_0000000010000,
-		SEVENS	= 0B_0000000100000_0000000100000_0000000100000_0000000100000,
-		EIGHTS	= 0B_0000001000000_0000001000000_0000001000000_0000001000000,
-		NINES	= 0B_0000010000000_0000010000000_0000010000000_0000010000000,
-		TENS		= 0B_0000100000000_0000100000000_0000100000000_0000100000000,
-		JACKS	= 0B_0001000000000_0001000000000_0001000000000_0001000000000,
-		QUEENS	= 0B_0010000000000_0010000000000_0010000000000_0010000000000,
-		KINGS	= 0B_0100000000000_0100000000000_0100000000000_0100000000000,
-		ACES		= 0b_1000000000000_1000000000000_1000000000000_1000000000000,
+		NONE				= 0,
 
 		// === CLUBS	===
-		TWO_OF_CLUBS = TWOS & CLUBS,
-		THREE_OF_CLUBS = THREES & CLUBS,
-		FOUR_OF_CLUBS = FOURS & CLUBS,
-		FIVE_OF_CLUBS = FIVES & CLUBS,
-		SIX_OF_CLUBS = SIXES & CLUBS,
-		SEVEN_OF_CLUBS = SEVENS & CLUBS,
-		EIGHT_OF_CLUBS = EIGHTS & CLUBS,
-		NINE_OF_CLUBS = NINES & CLUBS,
-		TEN_OF_CLUBS = TENS & CLUBS,
-		JACK_OF_CLUBS = JACKS & CLUBS,
-		QUEEN_OF_CLUBS = QUEENS & CLUBS,
-		KING_OF_CLUBS = KINGS & CLUBS,
-		ACE_OF_CLUBS = ACES & CLUBS,
+		TWO_OF_CLUBS		= 1ul << 00,
+		THREE_OF_CLUBS		= 1ul << 01,
+		FOUR_OF_CLUBS		= 1ul << 02,
+		FIVE_OF_CLUBS		= 1ul << 03,
+		SIX_OF_CLUBS		= 1ul << 04,
+		SEVEN_OF_CLUBS		= 1ul << 05,
+		EIGHT_OF_CLUBS		= 1ul << 06,
+		NINE_OF_CLUBS		= 1ul << 07,
+		TEN_OF_CLUBS		= 1ul << 08,
+		JACK_OF_CLUBS		= 1ul << 09,
+		QUEEN_OF_CLUBS		= 1ul << 10,
+		KING_OF_CLUBS		= 1ul << 11,
+		ACE_OF_CLUBS		= 1ul << 12,
 
 		// === DIAMONDS	===
-		TWO_OF_DIAMS = TWOS & DIAMONDS,
-		THREE_OF_DIAMS = THREES & DIAMONDS,
-		FOUR_OF_DIAMS = FOURS & DIAMONDS,
-		FIVE_OF_DIAMS = FIVES & DIAMONDS,
-		SIX_OF_DIAMS = SIXES & DIAMONDS,
-		SEVEN_OF_DIAMS = SEVENS & DIAMONDS,
-		EIGHT_OF_DIAMS = EIGHTS & DIAMONDS,
-		NINE_OF_DIAMS = NINES & DIAMONDS,
-		TEN_OF_DIAMS = TENS & DIAMONDS,
-		JACK_OF_DIAMS = JACKS & DIAMONDS,
-		QUEEN_OF_DIAMS = QUEENS & DIAMONDS,
-		KING_OF_DIAMS = KINGS & DIAMONDS,
-		ACE_OF_DIAMS = ACES & DIAMONDS,
+		TWO_OF_DIAMS		= 1ul << 13,
+		THREE_OF_DIAMS		= 1ul << 14,
+		FOUR_OF_DIAMS		= 1ul << 15,
+		FIVE_OF_DIAMS		= 1ul << 16,
+		SIX_OF_DIAMS		= 1ul << 17,
+		SEVEN_OF_DIAMS		= 1ul << 18,
+		EIGHT_OF_DIAMS		= 1ul << 19,
+		NINE_OF_DIAMS		= 1ul << 20,
+		TEN_OF_DIAMS		= 1ul << 21,
+		JACK_OF_DIAMS		= 1ul << 22,
+		QUEEN_OF_DIAMS		= 1ul << 23,
+		KING_OF_DIAMS		= 1ul << 24,
+		ACE_OF_DIAMS		= 1ul << 25,
 
 		// === HEARTS	===
-		TWO_OF_HEARTS = TWOS & HEARTS,
-		THREE_OF_HEARTS = THREES & HEARTS,
-		FOUR_OF_HEARTS = FOURS & HEARTS,
-		FIVE_OF_HEARTS = FIVES & HEARTS,
-		SIX_OF_HEARTS = SIXES & HEARTS,
-		SEVEN_OF_HEARTS = SEVENS & HEARTS,
-		EIGHT_OF_HEARTS = EIGHTS & HEARTS,
-		NINE_OF_HEARTS = NINES & HEARTS,
-		TEN_OF_HEARTS = TENS & HEARTS,
-		JACK_OF_HEARTS = JACKS & HEARTS,
-		QUEEN_OF_HEARTS = QUEENS & HEARTS,
-		KING_OF_HEARTS = KINGS & HEARTS,
-		ACE_OF_HEARTS = ACES & HEARTS,
+		TWO_OF_HEARTS		= 1ul << 26,
+		THREE_OF_HEARTS	= 1ul << 27,
+		FOUR_OF_HEARTS		= 1ul << 28,
+		FIVE_OF_HEARTS		= 1ul << 29,
+		SIX_OF_HEARTS		= 1ul << 30,
+		SEVEN_OF_HEARTS	= 1ul << 31,
+		EIGHT_OF_HEARTS	= 1ul << 32,
+		NINE_OF_HEARTS		= 1ul << 33,
+		TEN_OF_HEARTS		= 1ul << 34,
+		JACK_OF_HEARTS		= 1ul << 35,
+		QUEEN_OF_HEARTS	= 1ul << 36,
+		KING_OF_HEARTS		= 1ul << 37,
+		ACE_OF_HEARTS		= 1ul << 38,
 
 		// === SPADES ===
-		TWO_OF_SPADES = TWOS & SPADES,
-		THREE_OF_SPADES = THREES & SPADES,
-		FOUR_OF_SPADES = FOURS & SPADES,
-		FIVE_OF_SPADES = FIVES & SPADES,
-		SIX_OF_SPADES = SIXES & SPADES,
-		SEVEN_OF_SPADES = SEVENS & SPADES,
-		EIGHT_OF_SPADES = EIGHTS & SPADES,
-		NINE_OF_SPADES = NINES & SPADES,
-		TEN_OF_SPADES = TENS & SPADES,
-		JACK_OF_SPADES = JACKS & SPADES,
-		QUEEN_OF_SPADES = QUEENS & SPADES,
-		KING_OF_SPADES = KINGS & SPADES,
-		ACE_OF_SPADES = ACES & SPADES,
-
-		ALL = 0b_1111111111111_1111111111111_1111111111111_1111111111111,
+		TWO_OF_SPADES		= 1ul << 39,
+		THREE_OF_SPADES	= 1ul << 40,
+		FOUR_OF_SPADES		= 1ul << 41,
+		FIVE_OF_SPADES		= 1ul << 42,
+		SIX_OF_SPADES		= 1ul << 43,
+		SEVEN_OF_SPADES	= 1ul << 44,
+		EIGHT_OF_SPADES	= 1ul << 45,
+		NINE_OF_SPADES		= 1ul << 46,
+		TEN_OF_SPADES		= 1ul << 47,
+		JACK_OF_SPADES		= 1ul << 48,
+		QUEEN_OF_SPADES	= 1ul << 49,
+		KING_OF_SPADES		= 1ul << 50,
+		ACE_OF_SPADES		= 1ul << 51,
 	}
 
 	public static class CardsExtensions
 	{
 		extension(Cards)
 		{
-			public static Cards Select(Card element) => (Cards)Card.KeyOf(element);
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1) => (Cards)c1.ID;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2) => (Cards)(c1.ID | c2.ID);
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2, Card c3) => (Cards)(c1.ID | c2.ID | c3.ID);
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2, Card c3, Card c4) => (Cards)(c1.ID | c2.ID | c3.ID | c4.ID);
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2, Card c3, Card c4, Card c5) => (Cards)(c1.ID | c2.ID | c3.ID | c4.ID | c5.ID);
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2, Card c3, Card c4, Card c5, Card c6) => (Cards)(c1.ID | c2.ID | c3.ID | c4.ID | c5.ID | c6.ID);
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Cards Select(Card c1, Card c2, Card c3, Card c4, Card c5, Card c6, Card c7) => (Cards)(c1.ID | c2.ID | c3.ID | c4.ID | c5.ID | c6.ID | c7.ID);
+
+
+			public static Cards CLUBS => (Cards)0b1111111111111UL;
+			public static Cards DIAMONDS => (Cards)(0b1111111111111UL << 13);
+			public static Cards HEARTS => (Cards)(0b1111111111111UL << 26);
+			public static Cards SPADES => (Cards)(0b1111111111111UL << 39);
+			public static Cards ALL => Cards.CLUBS | Cards.DIAMONDS | Cards.HEARTS | Cards.SPADES;
 
 			public static Cards Select(params ReadOnlySpan<Card> elements)
 			{
-				var result = Cards.NONE;
+				var result = Cards.ACE_OF_CLUBS;
 
 				int n = elements.Length;
 				int i = 0;
 
 				while (i < n)
 				{
-					result |= Cards.Select(elements[i++]);
+					result |= (Cards)elements[i++].ID;
 				}
-				
 
 				return result;
 			}
@@ -153,10 +162,10 @@ namespace Infokom.Gaming.Poker.Atomics
 				{
 					var result = Suits.None;
 
-					result |= root.Clubs.IsEmpty	? Suits.None : Suits.Club;
-					result |= root.Diams.IsEmpty	? Suits.None : Suits.Diamond;
-					result |= root.Hearts.IsEmpty	? Suits.None : Suits.Heart;
-					result |= root.Spades.IsEmpty	? Suits.None : Suits.Spade;
+					result |= root.Clubs.IsEmpty ? Suits.None : Suits.Club;
+					result |= root.Diams.IsEmpty ? Suits.None : Suits.Diamond;
+					result |= root.Hearts.IsEmpty ? Suits.None : Suits.Heart;
+					result |= root.Spades.IsEmpty ? Suits.None : Suits.Spade;
 
 					return result;
 				}
@@ -166,14 +175,22 @@ namespace Infokom.Gaming.Poker.Atomics
 			public int Count => BitOperations.PopCount((ulong)root);
 			public bool IsEmpty => root == Cards.NONE;
 
+			internal int LowerFlagIndex => ((ulong)root).BSF;
 
-			internal int UppIndex => ((ulong)root).UppBit;
-			internal int LowIndex => ((ulong)root).LowBit;
+			internal int UpperFlagIndex => ((ulong)root).BSR;
 
-			public Card LowerBound => Card.Values[root.LowIndex];
-			public Card UpperBound => Card.Values[root.UppIndex];
+			internal Cards LowerFlag => (Cards)(1ul << ((ulong)root).BSF);
+
+			internal Cards UpperFlag => (Cards)(1ul << ((ulong)root).BSR);
+
+			public Card First => Card.Values[root.LowerFlagIndex];
+
+			public Card Last => Card.Values[root.UpperFlagIndex];
 
 
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Deconstruct(out Ranks clubs, out Ranks diamonds, out Ranks hearts, out Ranks spades)
 			{
 				clubs = (Ranks)((ulong)(root & Cards.CLUBS) >> 00);
@@ -183,17 +200,34 @@ namespace Infokom.Gaming.Poker.Atomics
 			}
 
 
-			public bool IsIncluded(Card element) => (root.ID & element.ID) != 0;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public bool IsIncluded(Card element) => (root.ID & element.ID).CNT != 0;
 
 
-			public Cards Include(Card element) => (Cards)(root.ID |  element.ID);
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Cards Include(Card c1) => (Cards)(root.ID | c1.ID);
 
+
+			public Cards Include(Card c1, Card c2) => (Cards)(root.ID | c1.ID | c2.ID);
+
+			
+			
+			
+			
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public Cards Exclude(Card element) => (Cards)(root.ID & ~element.ID);
 
+
+			public Cards Exclude(Card c1, Card c2) => (Cards)(root.ID & ~c1.ID & ~c2.ID);
+
+
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public Cards Exclude(params ReadOnlySpan<Card> elements)
 			{
 				var result = root;
-				
+
 				for (int i = 0; i < elements.Length; i++)
 				{
 					result = result.Exclude(elements[i]);
@@ -202,22 +236,55 @@ namespace Infokom.Gaming.Poker.Atomics
 				return result;
 			}
 
+
+
 			public int CopyTo(Span<Card> target)
+			{
+
+				var cards = root;
+
+				ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, cards.Count, "target.Length");
+
+				var count = 0;
+				while (!cards.IsEmpty)
+				{
+					var card = cards.First;
+					
+					target[count++] = card;
+
+					cards = cards.Exclude(card);
+				}
+
+				return count;
+			}
+
+			public int CopyTo(Span<Card> target, int count)
 			{
 				var mask = (ulong)root;
 
-				ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, root.Count, "target.Length");
+				var cards = root;
 
-				int count = 0;
-				foreach (var index in mask.Bits)
+				ArgumentOutOfRangeException.ThrowIfLessThan(root.Count, count, "root.Count");
+				ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, count, "target.Length");
+
+				count = 0;
+				while(!cards.IsEmpty)
 				{
-					target[count] = Card.Values[index];
-					count++;
+					var card = cards.First;
+					
+					target[count++] = card;
+
+					cards = cards.Exclude(card);
 				}
 
 				return count;
 			}
 		}
+
+
+
 	}
+
+
 
 }

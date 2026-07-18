@@ -25,6 +25,8 @@ namespace Holdem.Core.Internal
 		{
 			int n = players.Length;
 
+			var board = Cards.Select(flop1, flop2, flop3, turn, river);
+
 			// 1. Krijojmë vektorin bosh direkt në stack (0 Alokime në Heap)
 			Vector512<uint> result = Vector512<uint>.Zero;
 
@@ -38,8 +40,9 @@ namespace Holdem.Core.Internal
 				for (int i = 0; i < n; i++)
 				{
 					var (hi, lo) = players[i];
+					var hand = board.Include(hi, lo);
 
-					w[i] = HAND.Evaluate(hi, lo, flop1, flop2, flop3, turn, river);
+					w[i] = (uint)HAND.Evaluate(hand);
 				}
 			}
 
@@ -49,19 +52,21 @@ namespace Holdem.Core.Internal
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ulong Evaluate(Cards hand)
+		public static uint Evaluate(Cards hand)
 		{
+			var handCards = hand;
+			var cdhs = hand.Ranks;
+			var suits = hand.Suits;
+
+			var ccc = handCards & ~handCards;
+
 			Span<Card> cards = stackalloc Card[hand.Count];
-			Span<Rank> ranks = stackalloc Rank[hand.Count];
-			Span<Suit> suits = stackalloc Suit[hand.Count];
-
-
-			_ = hand.CopyTo(cards);
-			_ = hand.Ranks.CopyTo(ranks);
-			_ = hand.Suits.CopyTo(suits);
+			_ = handCards.CopyTo(cards);
 
 			// 1. Grumbullimi i të gjitha rangjeve në një maskë të vetme
 			var rankSpectrum = (uint)(hand.Ranks);
+
+			
 
 			// 2. Kontrolli i shpejtë dhe i saktë për FLUSH (cdhs - 4 bit)
 			var (c, d, h, s) = (hand.Clubs, hand.Diams, hand.Hearts, hand.Spades);
@@ -79,13 +84,13 @@ namespace Holdem.Core.Internal
 				uint flushSuitMask = sCount >= 5 ? 1U : (hCount >= 5 ? 2U : (dCount >= 5 ? 4U : 8U));
 
 				uint flushRanks = 0;
-				if ((suits[0].Mask & flushSuitMask) != 0) flushRanks |= (uint)ranks[0];
-				if ((suits[1] & flushSuitMask) != 0) flushRanks |= (uint)ranks[1];
-				if ((suits[2] & flushSuitMask) != 0) flushRanks |= (uint)ranks[2];
-				if ((suits[3] & flushSuitMask) != 0) flushRanks |= (uint)ranks[3];
-				if ((suits[4] & flushSuitMask) != 0) flushRanks |= (uint)ranks[4];
-				if ((suits[5] & flushSuitMask) != 0) flushRanks |= (uint)ranks[5];
-				if ((suits[6] & flushSuitMask) != 0) flushRanks |= (uint)ranks[6];
+				if ((cards[0].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[0].Rank;
+				if ((cards[1].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[1].Rank;
+				if ((cards[2].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[2].Rank;
+				if ((cards[3].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[3].Rank;
+				if ((cards[4].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[4].Rank;
+				//if ((cards[5].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[5].Rank;
+				//if ((cards[6].Suit.ID & flushSuitMask) != 0) flushRanks |= (uint)cards[6].Rank;
 
 				uint sfRanks = GetBest5CardStraight(flushRanks);
 				if (sfRanks != 0)
@@ -94,31 +99,33 @@ namespace Holdem.Core.Internal
 				return 0x50000000 + GetTop5Bits(flushRanks); // Flush (0x50000000)
 			}
 
-
-			var pairs = (c & d) | (c & h) | (c & s) | (d & h) | (d & s) | (h & s);
-			var trips = (c & d & h) | (c & d & s) | (c & h & s) | (d & h & s);
-			var quads = (c & d & h & s);
+			var r1 = (c | d | h | s);
+			var r2 = (c & d) | (c & h) | (c & s) | (d & h) | (d & s) | (h & s);
+			var r3 = (c & d & h) | (c & d & s) | (c & h & s) | (d & h & s);
+			var r4 = (c & d & h & s);
 
 			// 4. VLERËSIMI FINAL HIERARKIK
-			if (!quads.IsEmpty)
+			if (!r4.IsEmpty)
 			{
-				var rank = quads.UpperBound;
-				var kicker = (hand.Ranks & ~quads).UpperBound;
-				return 0x70000000 + (Rank.GetID(rank) << 13) + Rank.GetID(kicker); // Poker
+				(r4, _) = r4.HILO(1);//top quad rank
+				(r1, _) = (r1 ^ r4).HILO(1);//top rank not r4
+
+				return (uint)(0x70000000 + (r4.ID << 13) + r1.ID); // Poker
 			}
 
-			if (!trips.IsEmpty)
+			if (!r3.IsEmpty)
 			{
-				var r3 = Ranks.Select(trips.UpperBound);
-				var r2 = pairs & ~trips;
+				(r3, _) = r3.HILO(1);
+				(r2, _) = (r2 ^ r3).HILO(1);
 
-				// Full House: Ndodh nëse ka një çift tjetër, ose nëse ka më shumë se 1 rang me trips
-				if (r2.Count > 0 || trips.Count > 1)
+				if(!r2.IsEmpty)
 				{
-					r2 = !r2.IsEmpty ? r2 : (trips & ~r3);
-					r2 = Ranks.Select(r2.UpperBound);
-					return 0x60000000u + ((ulong)r3 << 13) + (ulong)r2; // Full House (0x60000000)
+					return (uint)(0x60000000u + (r3.ID << 13) + r2.ID); // Full House (0x60000000)
 				}
+
+				r1 = (r1 ^ r3).HILO(2).HI;
+
+				return (uint)(0x30000000 + (r3.ID << 13) + r1.ID); // Tris
 			}
 
 			// Kontrolli i Straight të thjeshtë
@@ -126,28 +133,24 @@ namespace Holdem.Core.Internal
 			if (straightRanks != 0)
 				return 0x40000000 + straightRanks; // Straight (0x40000000)
 
-			if (trips != 0)
+
+			if (r2.Count == 2)
 			{
-				uint tripRank = 1U << (31 - BitOperations.LeadingZeroCount(trips));
-				uint kickers = GetTop2Bits(rankSpectrum & ~tripRank);
-				return 0x30000000 + (tripRank << 13) + kickers; // Tris
+				(r2, _) = r2.HILO(2);
+				(r1, _) = (r1 ^ r2).HILO(1);
+
+				return (uint)(0x20000000 + (r2.ID << 13) + r1.ID); // Two Pair
 			}
 
-			int pairCount = pairs.Count;
-			if (pairCount >= 2)
+			if (r2.Count == 1)
 			{
-				var topPair = pairs.UpperBound;
-				var nextPair = pairs.Exclude(topPair);
-				uint kicker = 1U << (31 - BitOperations.LeadingZeroCount(rankSpectrum & ~(topPair | nextPair)));
-				return 0x20000000 + ((topPair | nextPair) << 13) + kicker; // Two Pair
-			}
-			if (pairCount == 1)
-			{
-				uint kickers = GetTop3Bits(rankSpectrum & ~pairs);
-				return 0x10000000 + (pairs << 13) + kickers; // One Pair
+				(r2, _) = r2.HILO(1);
+				(r1, _) = (r1 ^ r2).HILO(3); 
+
+				return (uint)(0x10000000 + (r2.ID << 13) + r1.ID); // One Pair
 			}
 
-			return 0x00000000 + GetTop5Bits(rankSpectrum); // High Card
+			return (uint)(0x00000000 + hand.Ranks.HILO(5).HI.ID); // High Card
 		}
 
 
@@ -175,29 +178,6 @@ namespace Holdem.Core.Internal
 			int pop = BitOperations.PopCount(mask);
 			if (pop == 7) mask &= mask - 1;
 			if (pop >= 6) mask &= mask - 1;
-			return mask;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static uint GetTop3Bits(uint mask)
-		{
-			int pop = BitOperations.PopCount(mask);
-			if (pop == 7) mask &= mask - 1;
-			if (pop >= 6) mask &= mask - 1;
-			if (pop >= 5) mask &= mask - 1;
-			if (pop >= 4) mask &= mask - 1;
-			return mask;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static uint GetTop2Bits(uint mask)
-		{
-			int pop = BitOperations.PopCount(mask);
-			if (pop == 7) mask &= mask - 1;
-			if (pop >= 6) mask &= mask - 1;
-			if (pop >= 5) mask &= mask - 1;
-			if (pop >= 4) mask &= mask - 1;
-			if (pop >= 3) mask &= mask - 1;
 			return mask;
 		}
 	}

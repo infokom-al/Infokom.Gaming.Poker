@@ -1,6 +1,9 @@
-﻿using Infokom.Numerics.Extensions;
+﻿using Infokom.Numerics;
+using Infokom.Numerics.Extensions;
 using Infokom.Numerics.Operators;
 
+using System.Collections.Concurrent;
+using System.Net.Security;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
@@ -27,62 +30,33 @@ namespace Infokom.Gaming.Poker.Atomics
 		All = 0b1111111111111
 	}
 
+
+
+
 	public static class RanksEnumExtension
 	{
 		extension(Ranks)
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private static Ranks Select() => Ranks.None;
-
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r) => Ranks.Select()
-				.Include(r);
+			public static Ranks Select(Rank r1) => (Ranks)(r1.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2) => Ranks.Select()
-				.Include(r1)
-				.Include(r2);
+			public static Ranks Select(Rank r1, Rank r2) => (Ranks)(r1.ID | r2.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2, Rank r3) => Ranks.Select()
-				.Include(r1)
-				.Include(r2)
-				.Include(r3);
+			public static Ranks Select(Rank r1, Rank r2, Rank r3) => (Ranks)(r1.ID | r2.ID | r3.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4) => Ranks.Select()
-				.Include(r1)
-				.Include(r2)
-				.Include(r3)
-				.Include(r4);
+			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4) => (Ranks)(r1.ID | r2.ID | r3.ID | r4.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5) => Ranks.Select()
-				.Include(r1)
-				.Include(r2)
-				.Include(r3)
-				.Include(r4)
-				.Include(r5);
+			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5) => (Ranks)(r1.ID | r2.ID | r3.ID | r4.ID | r5.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5, Rank r6) => Ranks.Select()
-				.Include(r1)
-				.Include(r2)
-				.Include(r3)
-				.Include(r4)
-				.Include(r5)
-				.Include(r6);
+			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5, Rank r6) => (Ranks)(r1.ID | r2.ID | r3.ID | r4.ID | r5.ID | r6.ID);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5, Rank r6, Rank r7) => Ranks.Select()
-				.Include(r1)
-				.Include(r2)
-				.Include(r3)
-				.Include(r4)
-				.Include(r5)
-				.Include(r6)
-				.Include(r7);
+			public static Ranks Select(Rank r1, Rank r2, Rank r3, Rank r4, Rank r5, Rank r6, Rank r7) => (Ranks)(r1.ID | r2.ID | r3.ID | r4.ID | r5.ID | r6.ID | r7.ID);
 
 			public static Ranks Select(params ReadOnlySpan<Rank> elements)
 			{
@@ -99,21 +73,6 @@ namespace Infokom.Gaming.Poker.Atomics
 				return selection;
 			}
 
-			
-
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private static int GetUppIndex(Ranks source) => ((ulong)source).UppBit;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private static int GetLowIndex(Ranks source) => ((ulong)source).LowBit;
-
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Rank GetUpperBound(Ranks source) => Rank.Values[Ranks.GetUppIndex(source)];
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Rank GetLowerBound(Ranks source) => Rank.Values[Ranks.GetLowIndex(source)];
 		}
 
 
@@ -138,48 +97,73 @@ namespace Infokom.Gaming.Poker.Atomics
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public Ranks Include(Rank rank) => (Ranks)(selection.ID | Rank.GetID(rank));
+			public Ranks Include(Rank element) => (Ranks)(selection.ID | element.ID);
 
-			public Ranks Exclude(Rank rank) => (Ranks)(selection.ID & ~Rank.GetID(rank));
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Ranks Exclude(Rank element) => (Ranks)(selection.ID & ~element.ID);
 
-			public bool IsIncluded(Rank rank) => (selection.ID & Rank.GetID(rank)) != 0;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public bool Contains(Rank element) => (selection.ID & element.ID) != 0;
 
-
-
-			public Rank UpperBound
+			internal (Ranks HI, Ranks LO) HILO(int i)
 			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Ranks.GetUpperBound(selection);
+				return ((Ranks, Ranks))((ulong)selection).HILO(i);
 			}
 
-			public Rank LowerBound
+			internal (Ranks LO, Ranks HI) LOHI(int i)
+			{
+				return ((Ranks, Ranks))((ulong)selection).HILO(^i);
+			}
+
+			public Ranks HI
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Ranks.GetLowerBound(selection);
+				get => (Ranks)(1UL << ((ulong)selection).BSR);
+			}
+
+			public Ranks LO
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => (Ranks)(1UL << ((ulong)selection).BSF);
 			}
 
 
+			public Rank Hi
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => Rank.Values[((ulong)selection).BSR];
+			}
 
+			public Rank Lo
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => Rank.Values[((ulong)selection).BSF];
+			}
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public int CopyTo(Span<Rank> target)
 			{
 				ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, selection.Count, "target.Length");
 
+				var mask =((ulong)selection);
+
 				int n = 0;
 
-				if (selection.IsIncluded(Rank.Two))	target[n++] = Rank.Two;
-				if (selection.IsIncluded(Rank.Three))	target[n++] = Rank.Three;
-				if (selection.IsIncluded(Rank.Four))	target[n++] = Rank.Four;
-				if (selection.IsIncluded(Rank.Five))	target[n++] = Rank.Five;
-				if (selection.IsIncluded(Rank.Six))	target[n++] = Rank.Six;
-				if (selection.IsIncluded(Rank.Seven))	target[n++] = Rank.Seven;
-				if (selection.IsIncluded(Rank.Eight))	target[n++] = Rank.Eight;
-				if (selection.IsIncluded(Rank.Nine))	target[n++] = Rank.Nine;
-				if (selection.IsIncluded(Rank.Ten))	target[n++] = Rank.Ten;
-				if (selection.IsIncluded(Rank.Jack))	target[n++] = Rank.Jack;
-				if (selection.IsIncluded(Rank.Queen))	target[n++] = Rank.Queen;
-				if (selection.IsIncluded(Rank.King))	target[n++] = Rank.King;
-				if (selection.IsIncluded(Rank.Ace))	target[n++] = Rank.Ace;
-
+				if (mask.BitTest(n))	target[n++] = Rank.Two;
+				if (mask.BitTest(n))	target[n++] = Rank.Three;
+				if (mask.BitTest(n))	target[n++] = Rank.Four;
+				if (mask.BitTest(n))	target[n++] = Rank.Five;
+				if (mask.BitTest(n))	target[n++] = Rank.Six;
+				if (mask.BitTest(n))	target[n++] = Rank.Seven;
+				if (mask.BitTest(n))	target[n++] = Rank.Eight;
+				if (mask.BitTest(n))	target[n++] = Rank.Nine;
+				if (mask.BitTest(n))	target[n++] = Rank.Ten;
+				if (mask.BitTest(n))	target[n++] = Rank.Jack;
+				if (mask.BitTest(n))	target[n++] = Rank.Queen;
+				if (mask.BitTest(n))	target[n++] = Rank.King;
+				if (mask.BitTest(n))	target[n++] = Rank.Ace;
+				
 				return n;
 			}
 		}

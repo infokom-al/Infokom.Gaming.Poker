@@ -1,12 +1,17 @@
 ﻿using Infokom.Gaming.Poker.Atomics;
 using Infokom.Numerics;
+using Infokom.Numerics.Attributes;
 
+using System.Collections.Immutable;
 using System.Numerics;
 using System.Xml.Linq;
 
+using static Infokom.Gaming.Poker.Deck;
+
 namespace Infokom.Gaming.Poker
 {
-	public struct Deck
+
+	public partial struct Deck
 	{
 		private Cards _cards;
 
@@ -32,7 +37,7 @@ namespace Infokom.Gaming.Poker
 		}
 
 		public Card Draw(Random random) => this.TryDraw(random, out int index) ? Card.Values[index] : throw new InvalidOperationException("Empty deck");
-		
+
 
 		/// <summary>
 		/// 
@@ -47,7 +52,7 @@ namespace Infokom.Gaming.Poker
 			ArgumentNullException.ThrowIfNull(target, nameof(target));
 			ArgumentOutOfRangeException.ThrowIfGreaterThan(count, _cards.Count);
 			ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + count, target.Length);
-			
+
 
 			for (int i = 0; i < count; i++)
 			{
@@ -124,6 +129,4 @@ namespace Infokom.Gaming.Poker
 		}
 
 	}
-
-
 }

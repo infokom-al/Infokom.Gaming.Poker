@@ -14,79 +14,79 @@ namespace Infokom.Gaming.Poker.Atomics
 		/// Two of Clubs
 		/// </summary>
 		[Description("2c")]
-		TwoOfClubs	= Rank.Two | (Suit.Club << 8),
+		TwoOfClubs = Rank.Two | (Suit.Club << 8),
 
 		/// <summary>
 		/// Three of Clubs
 		/// </summary>
 		[Description("3c")]
-		ThreeOfClubs	= Rank.Three | (Suit.Club << 8),
+		ThreeOfClubs = Rank.Three | (Suit.Club << 8),
 
 		/// <summary>
 		/// Four of Clubs
 		/// </summary>
 		[Description("4c")]
-		FourOfClubs	= Rank.Four | (Suit.Club << 8),
+		FourOfClubs = Rank.Four | (Suit.Club << 8),
 
 		/// <summary>
 		/// Five of Clubs
 		/// </summary>
 		[Description("5c")]
-		FiveOfClubs	= Rank.Five | (Suit.Club << 8),
+		FiveOfClubs = Rank.Five | (Suit.Club << 8),
 
 		/// <summary>
 		/// Six of Clubs
 		/// </summary>
 		[Description("6c")]
-		SixOfClubs	= Rank.Six | (Suit.Club << 8),
+		SixOfClubs = Rank.Six | (Suit.Club << 8),
 
 		/// <summary>
 		/// Seven of Clubs
 		/// </summary>
 		[Description("7c")]
-		SevenOfClubs	= Rank.Seven | (Suit.Club << 8),
+		SevenOfClubs = Rank.Seven | (Suit.Club << 8),
 
 		/// <summary>
 		/// Eight of Clubs
 		/// </summary>
 		[Description("8c")]
-		EightOfClubs	= Rank.Eight | (Suit.Club << 8),
+		EightOfClubs = Rank.Eight | (Suit.Club << 8),
 
 		/// <summary>
 		/// Nine of Clubs
 		/// </summary>
 		[Description("9c")]
-		NineOfClubs	= Rank.Nine | (Suit.Club << 8),
+		NineOfClubs = Rank.Nine | (Suit.Club << 8),
 
 		/// <summary>
 		/// Ten of Clubs
 		/// </summary>
 		[Description("10c")]
-		TenOfClubs	= Rank.Ten | (Suit.Club << 8),
+		TenOfClubs = Rank.Ten | (Suit.Club << 8),
 
 		/// <summary>
 		/// Jack of Clubs
 		/// </summary>
 		[Description("Jc")]
-		JackOfClubs	= Rank.Jack | (Suit.Club << 8),
+		JackOfClubs = Rank.Jack | (Suit.Club << 8),
 
 		/// <summary>
 		/// Queen of Clubs
 		/// </summary>
 		[Description("Qc")]
-		QueenOfClubs	= Rank.Queen | (Suit.Club << 8),
+		QueenOfClubs = Rank.Queen | (Suit.Club << 8),
 
 		/// <summary>
 		/// King of Clubs
 		/// </summary>
 		[Description("Kc")]
-		KingOfClubs	= Rank.King | (Suit.Club << 8),
+		KingOfClubs = Rank.King | (Suit.Club << 8),
 
 		/// <summary>
 		/// Ace of Clubs
 		/// </summary>
 		[Description("Ac")]
-		AceOfClubs	= Rank.Ace | (Suit.Club << 8),
+		AceOfClubs = Rank.Ace | (Suit.Club << 8),
 
 
 		// === DIAMONDS (d) ===
@@ -95,79 +95,79 @@ namespace Infokom.Gaming.Poker.Atomics
 		/// Two of Diamonds
 		/// </summary>
 		[Description("2d")]
-		TwoOfDiamonds	= Rank.Two | (Suit.Diamond << 8),
+		TwoOfDiamonds = Rank.Two | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Three of Diamonds
 		/// </summary>
 		[Description("3d")]
-		ThreeOfDiamonds	= Rank.Three | (Suit.Diamond << 8),
+		ThreeOfDiamonds = Rank.Three | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Four of Diamonds
 		/// </summary>
 		[Description("4d")]
-		FourOfDiamonds	= Rank.Four | (Suit.Diamond << 8),
+		FourOfDiamonds = Rank.Four | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Five of Diamonds
 		/// </summary>
 		[Description("5d")]
-		FiveOfDiamonds	= Rank.Five | (Suit.Diamond << 8),
+		FiveOfDiamonds = Rank.Five | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Six of Diamonds
 		/// </summary>
 		[Description("6d")]
-		SixOfDiamonds	= Rank.Six | (Suit.Diamond << 8),
+		SixOfDiamonds = Rank.Six | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Seven of Diamonds
 		/// </summary>
 		[Description("7d")]
-		SevenOfDiamonds	= Rank.Seven | (Suit.Diamond << 8),
+		SevenOfDiamonds = Rank.Seven | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Eight of Diamonds
 		/// </summary>
 		[Description("8d")]
-		EightOfDiamonds	= Rank.Eight | (Suit.Diamond << 8),
+		EightOfDiamonds = Rank.Eight | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Nine of Diamonds
 		/// </summary>
 		[Description("9d")]
-		NineOfDiamonds	= Rank.Nine | (Suit.Diamond << 8),
+		NineOfDiamonds = Rank.Nine | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Ten of Diamonds
 		/// </summary>
 		[Description("10d")]
-		TenOfDiamonds	= Rank.Ten | (Suit.Diamond << 8),
+		TenOfDiamonds = Rank.Ten | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Jack of Diamonds
 		/// </summary>
 		[Description("Jd")]
-		JackOfDiamonds	= Rank.Jack | (Suit.Diamond << 8),
+		JackOfDiamonds = Rank.Jack | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Queen of Diamonds
 		/// </summary>
 		[Description("Qd")]
-		QueenOfDiamonds	= Rank.Queen | (Suit.Diamond << 8),
+		QueenOfDiamonds = Rank.Queen | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// King of Diamonds
 		/// </summary>
 		[Description("Kd")]
-		KingOfDiamonds	= Rank.King | (Suit.Diamond << 8),
+		KingOfDiamonds = Rank.King | (Suit.Diamond << 8),
 
 		/// <summary>
 		/// Ace of Diamonds
 		/// </summary>
 		[Description("Ad")]
-		AceOfDiamonds	= Rank.Ace | (Suit.Diamond << 8),
+		AceOfDiamonds = Rank.Ace | (Suit.Diamond << 8),
 
 
 		// === HEARTS (h) ===
@@ -176,79 +176,79 @@ namespace Infokom.Gaming.Poker.Atomics
 		/// Two of Hearts
 		/// </summary>
 		[Description("2h")]
-		TwoOfHearts	= Rank.Two | (Suit.Heart << 8),
+		TwoOfHearts = Rank.Two | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Three of Hearts
 		/// </summary>
 		[Description("3h")]
-		ThreeOfHearts	= Rank.Three | (Suit.Heart << 8),
+		ThreeOfHearts = Rank.Three | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Four of Hearts
 		/// </summary>
 		[Description("4h")]
-		FourOfHearts	= Rank.Four | (Suit.Heart << 8),
+		FourOfHearts = Rank.Four | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Five of Hearts
 		/// </summary>
 		[Description("5h")]
-		FiveOfHearts	= Rank.Five | (Suit.Heart << 8),
+		FiveOfHearts = Rank.Five | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Six of Hearts
 		/// </summary>
 		[Description("6h")]
-		SixOfHearts	= Rank.Six | (Suit.Heart << 8),
+		SixOfHearts = Rank.Six | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Seven of Hearts
 		/// </summary>
 		[Description("7h")]
-		SevenOfHearts	= Rank.Seven | (Suit.Heart << 8),
+		SevenOfHearts = Rank.Seven | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Eight of Hearts
 		/// </summary>
 		[Description("8h")]
-		EightOfHearts	= Rank.Eight | (Suit.Heart << 8),
+		EightOfHearts = Rank.Eight | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Nine of Hearts
 		/// </summary>
 		[Description("9h")]
-		NineOfHearts	= Rank.Nine | (Suit.Heart << 8),
+		NineOfHearts = Rank.Nine | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Ten of Hearts
 		/// </summary>
 		[Description("10h")]
-		TenOfHearts	= Rank.Ten | (Suit.Heart << 8),
+		TenOfHearts = Rank.Ten | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Jack of Hearts
 		/// </summary>
 		[Description("Jh")]
-		JackOfHearts	= Rank.Jack | (Suit.Heart << 8),
+		JackOfHearts = Rank.Jack | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Queen of Hearts
 		/// </summary>
 		[Description("Qh")]
-		QueenOfHearts	= Rank.Queen | (Suit.Heart << 8),
+		QueenOfHearts = Rank.Queen | (Suit.Heart << 8),
 
 		/// <summary>
 		/// King of Hearts
 		/// </summary>
 		[Description("Kh")]
-		KingOfHearts	= Rank.King | (Suit.Heart << 8),
+		KingOfHearts = Rank.King | (Suit.Heart << 8),
 
 		/// <summary>
 		/// Ace of Hearts
 		/// </summary>
 		[Description("Ah")]
-		AceOfHearts	= Rank.Ace | (Suit.Heart << 8),
+		AceOfHearts = Rank.Ace | (Suit.Heart << 8),
 
 
 		// === SPADES (s) ===
@@ -336,70 +336,104 @@ namespace Infokom.Gaming.Poker.Atomics
 
 	public static class CardExtensions
 	{
-		private static readonly ImmutableArray<Card> VALUES = [.. Rank.Values.SelectMany(r => Suit.Values.Select(s => Card.Of(r, s)))];
+		private static readonly ImmutableArray<Card> VALUES = [.. Suit.Values.SelectMany(s => Rank.Values.Select(r => Card.Of(r, s)))];
 
-		
+
 
 		extension(Card source)
 		{
-			public static ImmutableArray<Card> Values => VALUES;
+			public Rank Rank
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => (Rank)(((ushort)source >> 0) & 0xFF);
+			}
 
-			public ulong ID => Card.KeyOf(source);
+			public Suit Suit
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => (Suit)(((ushort)source >> 8) & 0xFF);
+			}
 
-			public ReadOnlySpan<char> Symbol => Card.SymbolOf(source);
 
-			public Rank Rank => (Rank)(((ushort)source >> 0)	&	0xFF);
+			public ulong ID
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get
+				{
+					var idx = source.Index;
+					if (idx < 0) return 0;
+					return 1UL << idx;
+				}
+			}
 
-			public Suit Suit => (Suit)(((ushort)source >> 8)	&	0xFF);
+			public int Index
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get
+				{
+					var r = source.Rank.Index;
+					if (r < 0) return -1;
+
+					var s = source.Suit.Index;
+					if (s < 0) return -1;
+					
+					return r + s * 13;
+				}
+			}
+
+			public ReadOnlySpan<char> Symbol => new[] { source.Rank.Symbol, source.Suit.Symbol };
+
 
 
 
 			/// <summary>
 			/// Check if at least the <see cref="Rank"/> component of a card is known
 			/// </summary>
-			public bool IsRankable => source.Rank.IsKnown;
+			public bool IsRankable
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source.Rank.IsKnown;
+			}
 
 			/// <summary>
 			///  Check if at least the <see cref="Suit"/> component of a card is known
 			/// </summary>
-			public bool IsSuitable => source.Suit.IsKnown;
+			public bool IsSuitable
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source.Suit.IsKnown;
+			}
+
 
 			/// <summary>
 			/// Check if a <see cref="Card"/> value has a known rank and suit
 			/// </summary>
-			public bool IsDrawable => source.IsKnown;//expected equivalent to IsRankable && IsSuitable
+			public bool IsDrawable
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => source.IsKnown;//expected equivalent to IsRankable && IsSuitable
+			}
 
-
-
-
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public void Deconstruct(out Rank rank, out Suit suit)
 			{
-				rank = (Rank)(((ushort)source >> 0)	&	0xFF);
-				suit = (Suit)(((ushort)source >> 8)	&	0xFF);
+				rank = (Rank)(((ushort)source >> 0) & 0xFF);
+				suit = (Suit)(((ushort)source >> 8) & 0xFF);
 			}
 		}
 
 		extension(Card)
 		{
+
+			public static ImmutableArray<Card> Values => VALUES;
+
+
+
+
+
+
+
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static ulong KeyOf(Card source)
-			{
-				var (r, s) = source;
-
-				return r.ID << (s.Index * Rank.Count);
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static int IndexOf(Card source) => BitOperations.TrailingZeroCount(Card.KeyOf(source));
-
-			public static ReadOnlySpan<char> SymbolOf(Card source)
-			{
-				var (r, s) = source;
-				
-				return new[] { Rank.SymbolOf(r), Suit.SymbolOf(s) };
-			}
-
-
 			public static Card Of(Rank r, Suit s) => (Card)((ushort)r | ((ushort)s << 8));
 
 
@@ -421,26 +455,16 @@ namespace Infokom.Gaming.Poker.Atomics
 
 				return false;
 			}
-			
+
 			public static Card Parse(ReadOnlySpan<char> source)
 			{
-				if(TryParse(source, out var result))
+				if (TryParse(source, out var result))
 				{
 					return result;
 				}
 
 				throw new FormatException();
 			}
-
-			public static int Compare(Card c1, Card c2)
-			{
-				var n = c1.Rank.Index.CompareTo(c2.Rank.Index);
-
-				if (n == 0)
-					n = c1.Suit.Index.CompareTo(c2.Suit.Index);
-
-				return n;
-			}			
 		}
 	}
 }

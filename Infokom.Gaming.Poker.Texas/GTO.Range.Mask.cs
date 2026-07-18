@@ -1,5 +1,6 @@
 ﻿using Holdem.Core.Extensions;
 
+using Infokom.Gaming.Poker.Atomics;
 using Infokom.Numerics;
 
 using System.Text.RegularExpressions;
@@ -278,7 +279,7 @@ namespace Holdem.Core
 
 					try
 					{
-						var rank = Card.Ranking.Of(match.Groups[1].Value[0]);
+						var rank = Rank.ConvertFrom(match.Groups[1].Value[0]);
 
 
 						bool hasPlus = match.Groups[2].Success && match.Groups[2].Value == "+";
@@ -293,7 +294,7 @@ namespace Holdem.Core
 						{
 							for (int i = rank.Index; i <= 12; i++)
 							{
-								rank = Card.Ranking.Values[i];
+								rank = Rank.Values[i];
 
 								mask |= mask.Include(Cell.Pair(rank));
 							}
@@ -324,8 +325,8 @@ namespace Holdem.Core
 					if (!match.Success)
 						return false;
 
-					var hi = Card.Ranking.Of(match.Groups[1].Value[0]);
-					var lo = Card.Ranking.Of(match.Groups[2].Value[0]);
+					var hi = Rank.ConvertFrom(match.Groups[1].Value[0]);
+					var lo = Rank.ConvertFrom(match.Groups[2].Value[0]);
 					bool hasPlus = match.Groups[3].Success && match.Groups[3].Value == "+";
 
 					try
@@ -338,7 +339,7 @@ namespace Holdem.Core
 						{
 							for (int i = lo.Index; i < hi.Index; i++)
 							{
-								lo = Card.Ranking.Values[i];
+								lo = Rank.Values[i];
 								mask |= mask.Include(Cell.Suited(hi, lo));
 							}
 						}
@@ -369,8 +370,8 @@ namespace Holdem.Core
 					if (!match.Success)
 						return false;
 
-					var hi = Card.Ranking.Of(match.Groups[1].Value[0]);
-					var lo = Card.Ranking.Of(match.Groups[2].Value[0]);
+					var hi = Rank.ConvertFrom(match.Groups[1].Value[0]);
+					var lo = Rank.ConvertFrom(match.Groups[2].Value[0]);
 					bool hasPlus = match.Groups[3].Success && match.Groups[3].Value == "+";
 
 					try
@@ -383,7 +384,7 @@ namespace Holdem.Core
 						{
 							for (int i = lo.Index; i < hi.Index; i++)
 							{
-								lo = Card.Ranking.Values[i];
+								lo = Rank.Values[i];
 								mask |= mask.Include(Cell.Offsuited(hi, lo));
 							}
 						}

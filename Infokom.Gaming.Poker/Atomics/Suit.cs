@@ -23,24 +23,11 @@ namespace Infokom.Gaming.Poker.Atomics
 
 		extension(Suit)
 		{
-			
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static ulong GetID(Suit suit) => suit switch
-			{
-				Suit.Club		=> 0b0001,
-				Suit.Diamond	=> 0b0010,
-				Suit.Heart	=> 0b0100,
-				Suit.Spade	=> 0b1000,
-				_			=> 0b0000,
-			};
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static ulong MaskOf(Suit suit) => GetID(suit);
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static int IndexOf(Suit source)
 			{
-				var id = Suit.GetID(source);
+				var id = source.ID;
 
 				return id == default ? -1 : BitOperations.TrailingZeroCount(id);
 			}
@@ -89,25 +76,33 @@ namespace Infokom.Gaming.Poker.Atomics
 			public ulong ID
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Suit.GetID(source);
-			}
-
-			public ulong Mask
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Suit.MaskOf(source);
+				get => source switch
+				{
+					Suit.Club      => 0b0001,
+					Suit.Diamond   => 0b0010,
+					Suit.Heart     => 0b0100,
+					Suit.Spade     => 0b1000,
+					_			=> 0b0000,
+				};
 			}
 
 			public int Index
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Suit.IndexOf(source);
+				get => source switch
+				{
+					Suit.Club		=>  0,
+					Suit.Diamond	=>  1,
+					Suit.Heart	=>  2,
+					Suit.Spade	=>  3,
+					_			=> -1,
+				};
 			}
 
 			public char Symbol
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Suit.SymbolOf(source);
+				get => (char)source;
 			}
 
 			public bool IsKnown

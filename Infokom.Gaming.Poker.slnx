@@ -5,16 +5,13 @@
   </Configurations>
   <Folder Name="/Apps/" />
   <Folder Name="/Apps/CLI/">
-    <Project Path="Infokom.Gaming.Poker.Apps.CLI.ConsoleApp/Infokom.Gaming.Poker.Apps.CLI.ConsoleApp.csproj" Id="081b8c87-662a-4075-8e8f-ba55b5acd996" />
+    <Project Path="TexasHandEvaluator/TexasHandEvaluator.csproj" Id="d11a5801-0fb6-4709-b6c8-631d0650fc6b" />
   </Folder>
   <Folder Name="/Apps/GUI/" />
   <Folder Name="/Apps/WEB/" />
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="Infokom.Gaming.Poker.Apps.CLI.TexasPocketEvaluation/Infokom.Gaming.Poker.Apps.CLI.TexasPocketEvaluation.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
   <Project Path="Infokom.Gaming.Poker.Texas/Infokom.Gaming.Poker.Texas.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
