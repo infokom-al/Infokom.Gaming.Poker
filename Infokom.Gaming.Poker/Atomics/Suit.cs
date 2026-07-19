@@ -23,14 +23,8 @@ namespace Infokom.Gaming.Poker.Atomics
 
 		extension(Suit)
 		{
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static int IndexOf(Suit source)
-			{
-				var id = source.ID;
-
-				return id == default ? -1 : BitOperations.TrailingZeroCount(id);
-			}
+			public static int Count => 4;
+			
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static char SymbolOf(Suit suit) => (char)suit;
@@ -55,17 +49,55 @@ namespace Infokom.Gaming.Poker.Atomics
 
 
 
-			public static int Count => 4;
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="source"></param>
+			/// <returns>0 based order index of <paramref name="source"/> if matches one of the known values declared in <see cref="Suit"/>, -1 otherwise.</returns>
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static int IndexOf(Suit source) => source switch
+			{
+				Suit.Club		=> 0x0,
+				Suit.Diamond	=> 0x1,
+				Suit.Heart	=> 0x2,
+				Suit.Spade	=> 0x3,
+				_			=> -1,
+			};
 
-
-			public static Suit Of(Index index) => index.Value switch
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Suit ValueOf(int index) => index switch
 			{
 				0 => Suit.Club,
 				1 => Suit.Diamond,
 				2 => Suit.Heart,
 				3 => Suit.Spade,
-				_ => throw new IndexOutOfRangeException(),
+				_ => default,
 			};
+
+			public static bool ValueOf(int index, out Suit suit) => (suit = index switch
+			{
+				0 => Suit.Club,
+				1 => Suit.Diamond,
+				2 => Suit.Heart,
+				3 => Suit.Spade,
+				_ => default,
+			}) != default;
+
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="index"></param>
+			/// <returns>A known <see cref="Suit"/> suit value id <paramref name="index"/> is in valuid range,  or default</returns>
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Suit ValueOf(Index index) => Suit.ValueOf(index.GetOffset(Suit.Count));
+
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static bool ValueOf(Index index, out Suit suit) => Suit.ValueOf(index.GetOffset(Suit.Count), out suit);
+
+
+
 
 			public static ImmutableArray<Suit> Values => VALUES;
 		}

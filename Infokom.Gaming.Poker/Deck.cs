@@ -11,7 +11,7 @@ using static Infokom.Gaming.Poker.Deck;
 namespace Infokom.Gaming.Poker
 {
 
-	public partial struct Deck
+	public class Deck
 	{
 		private Cards _cards;
 
@@ -21,12 +21,12 @@ namespace Infokom.Gaming.Poker
 			_cards = Cards.ALL;
 		}
 
-		public readonly bool IsEmpty => _cards.IsEmpty;
+		public bool IsEmpty => _cards.IsEmpty;
 
-		public readonly int Count => _cards.Count;
+		public int Count => _cards.Count;
 
 
-		public readonly bool Contains(Card card) => _cards.IsIncluded(card);
+		public bool Contains(Card card) => _cards.IsIncluded(card);
 
 
 		public bool TryDraw(Random random, out Card card)
@@ -74,24 +74,12 @@ namespace Infokom.Gaming.Poker
 
 
 
-		public void Exclude(Card element)
-		{
-			_cards = _cards.Exclude(element);
-		}
-
-		public void Exclude(params ReadOnlySpan<Card> elements)
-		{
-			_cards = _cards.Exclude(elements);
-		}
-
-		public void Exclude(Cards elements)
+		public void Remove(Card element) => this.Remove(Cards.Select(element));
+		public void Remove(params ReadOnlySpan<Card> elements) => this.Remove(Cards.Select(elements));
+		internal void Remove(Cards elements)
 		{
 			_cards |= ~elements;
 		}
-
-
-
-
 
 		private bool TryDraw(Random random, out int index)
 		{
@@ -99,7 +87,6 @@ namespace Infokom.Gaming.Poker
 
 			if (!_cards.IsEmpty)
 			{
-
 				// 1. Zgjedhim indeksin e bitit të ndezur që duam të tërheqim
 				index = random.Next(_cards.Count);
 

@@ -14,19 +14,19 @@ namespace Infokom.Gaming.Poker.Atomics
 {
 	public enum Rank : byte
 	{
-		[ID<ulong>(1UL << 0x0), Index<int>(0x0), Label("2")] Two	= Symbol.Two,
-		[ID<ulong>(1UL << 0x1), Index<int>(0x1), Label("3")] Three	= Symbol.Three,
-		[ID<ulong>(1UL << 0x2), Index<int>(0x2), Label("4")] Four	= Symbol.Four,
-		[ID<ulong>(1UL << 0x3), Index<int>(0x3), Label("5")] Five	= Symbol.Five,
-		[ID<ulong>(1UL << 0x4), Index<int>(0x4), Label("6")] Six	= Symbol.Six,
-		[ID<ulong>(1UL << 0x5), Index<int>(0x5), Label("7")] Seven	= Symbol.Seven,
-		[ID<ulong>(1UL << 0x6), Index<int>(0x6), Label("8")] Eight	= Symbol.Eight,
-		[ID<ulong>(1UL << 0x7), Index<int>(0x7), Label("9")] Nine	= Symbol.Nine,
-		[ID<ulong>(1UL << 0x8), Index<int>(0x8), Label("T")] Ten	= Symbol.Ten,
-		[ID<ulong>(1UL << 0x9), Index<int>(0x9), Label("J")] Jack	= Symbol.Jack,
-		[ID<ulong>(1UL << 0xA), Index<int>(0xA), Label("Q")] Queen	= Symbol.Queen,
-		[ID<ulong>(1UL << 0xB), Index<int>(0xB), Label("K")] King	= Symbol.King,
-		[ID<ulong>(1UL << 0xC), Index<int>(0xC), Label("A")] Ace	= Symbol.Ace,
+		[ID<ulong>(1UL << 0x0), Index<int>(0x0), Label("2")] Two = Symbol.Two,
+		[ID<ulong>(1UL << 0x1), Index<int>(0x1), Label("3")] Three = Symbol.Three,
+		[ID<ulong>(1UL << 0x2), Index<int>(0x2), Label("4")] Four = Symbol.Four,
+		[ID<ulong>(1UL << 0x3), Index<int>(0x3), Label("5")] Five = Symbol.Five,
+		[ID<ulong>(1UL << 0x4), Index<int>(0x4), Label("6")] Six = Symbol.Six,
+		[ID<ulong>(1UL << 0x5), Index<int>(0x5), Label("7")] Seven = Symbol.Seven,
+		[ID<ulong>(1UL << 0x6), Index<int>(0x6), Label("8")] Eight = Symbol.Eight,
+		[ID<ulong>(1UL << 0x7), Index<int>(0x7), Label("9")] Nine = Symbol.Nine,
+		[ID<ulong>(1UL << 0x8), Index<int>(0x8), Label("T")] Ten = Symbol.Ten,
+		[ID<ulong>(1UL << 0x9), Index<int>(0x9), Label("J")] Jack = Symbol.Jack,
+		[ID<ulong>(1UL << 0xA), Index<int>(0xA), Label("Q")] Queen = Symbol.Queen,
+		[ID<ulong>(1UL << 0xB), Index<int>(0xB), Label("K")] King = Symbol.King,
+		[ID<ulong>(1UL << 0xC), Index<int>(0xC), Label("A")] Ace = Symbol.Ace,
 	}
 
 
@@ -60,25 +60,25 @@ namespace Infokom.Gaming.Poker.Atomics
 				};
 			}
 
-			public int Index 
+			public int Index
 			{
 				[MethodImpl(MethodImplOptions.AggressiveInlining)]
 				get => source switch
 				{
-					Rank.Two		=> 0,
-					Rank.Three	=> 1,
-					Rank.Four		=> 2,
-					Rank.Five		=> 3,
-					Rank.Six		=> 4,
-					Rank.Seven	=> 5,
-					Rank.Eight	=> 6,
-					Rank.Nine		=> 7,
-					Rank.Ten		=> 8,
-					Rank.Jack		=> 9,
-					Rank.Queen	=> 10,
-					Rank.King		=> 11,
-					Rank.Ace		=> 12,
-					_			=> -1
+					Rank.Two => 0,
+					Rank.Three => 1,
+					Rank.Four => 2,
+					Rank.Five => 3,
+					Rank.Six => 4,
+					Rank.Seven => 5,
+					Rank.Eight => 6,
+					Rank.Nine => 7,
+					Rank.Ten => 8,
+					Rank.Jack => 9,
+					Rank.Queen => 10,
+					Rank.King => 11,
+					Rank.Ace => 12,
+					_ => -1
 				};
 			}
 
@@ -116,7 +116,7 @@ namespace Infokom.Gaming.Poker.Atomics
 			{
 				target = (Rank)symbol;
 
-				if(target.IsKnown)
+				if (target.IsKnown)
 				{
 					return true;
 				}
@@ -128,12 +128,84 @@ namespace Infokom.Gaming.Poker.Atomics
 
 			public static Rank ConvertFrom(char symbol)
 			{
-				if(Rank.TryConvertFrom(symbol, out var rank))
+				if (Rank.TryConvertFrom(symbol, out var rank))
 				{
-					return rank;		
+					return rank;
 				}
 				throw new ArgumentOutOfRangeException(nameof(symbol), symbol, "");
 			}
+
+			/// <summary>
+			/// 0 based integer indexing a rank value through all possible known values
+			/// </summary>
+			/// <param name="rank"></param>
+			/// <returns></returns>
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static int IndexOf(Rank rank) => rank switch
+			{
+				Rank.Two		=> 0x0,
+				Rank.Three	=> 0x1,
+				Rank.Four		=> 0x2,
+				Rank.Five		=> 0x3,
+				Rank.Six		=> 0x4,
+				Rank.Seven	=> 0x5,
+				Rank.Eight	=> 0x6,
+				Rank.Nine		=> 0x7,
+				Rank.Ten		=> 0x8,
+				Rank.Jack		=> 0x9,
+				Rank.Queen	=> 0xA,
+				Rank.King		=> 0xB,
+				Rank.Ace		=> 0xC,
+				_ => -1
+			};
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Rank ValueOf(int index)
+			{
+				return index switch
+				{
+					0x0 => Rank.Two,
+					0x1 => Rank.Three,
+					0x2 => Rank.Four,
+					0x3 => Rank.Five,
+					0x4 => Rank.Six,
+					0x5 => Rank.Seven,
+					0x6 => Rank.Eight,
+					0x7 => Rank.Nine,
+					0x8 => Rank.Ten,
+					0x9 => Rank.Jack,
+					0xA => Rank.Queen,
+					0xB => Rank.King,
+					0xC => Rank.Ace,
+					_	=> throw new IndexOutOfRangeException()
+				};
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static bool ValueOf(int index, out Rank rank) => (rank = index switch
+			{
+				0x0 => Rank.Two,
+				0x1 => Rank.Three,
+				0x2 => Rank.Four,
+				0x3 => Rank.Five,
+				0x4 => Rank.Six,
+				0x5 => Rank.Seven,
+				0x6 => Rank.Eight,
+				0x7 => Rank.Nine,
+				0x8 => Rank.Ten,
+				0x9 => Rank.Jack,
+				0xA => Rank.Queen,
+				0xB => Rank.King,
+				0xC => Rank.Ace,
+				_ => default,
+			}) != default;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static Rank ValueOf(Index index) => Rank.ValueOf(index.GetOffset(13));
+
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static bool ValueOf(Index index, out Card card) => Rank.ValueOf(index.GetOffset(13), out card);
 		}
 	}
 

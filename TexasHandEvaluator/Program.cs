@@ -1,4 +1,13 @@
-﻿using Holdem.Core;
+﻿using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Running;
+
+using Holdem.Core;
+
+using Infokom.Gaming.Poker;
+using Infokom.Gaming.Poker.Atomics;
+using Infokom.Gaming.Poker.Texas;
+
+using TexasHandEvaluator.Benchmarks;
 
 namespace TexasHandEvaluator
 {
@@ -6,12 +15,35 @@ namespace TexasHandEvaluator
 	{
 		static void Main()
 		{
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Ad, Ah, As, Kc]")));
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Ad, Ah, Ks, Kc]")));
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Ad, Ah, Ks, Qc]")));
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Ad, Kh, Qs, Jc]")));
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Kd, Qh, Js, Tc]")));
-			Console.WriteLine(Hand.Evaluate(Hand.Parse("[Ac, Kc, Qc, Jc, Tc]")));
+			RunBoardDemo();
+
+			//RunBenchmarks();
 		}
+
+		private static void RunBenchmarks()
+		{
+			_ = BenchmarkRunner.Run<BoardBenchmarks>();
+		}
+
+		private static void RunBoardDemo()
+		{
+			var deck = new Deck();
+			var rand = Random.Shared;
+
+			var hand = Hand.Create(2, i => deck.Draw(rand));
+
+			var commons = hand.Board.ToString();
+			var pockets = hand.Pockets.Select(p => p.ToString()).ToArray();
+
+
+			foreach(var p in pockets)
+			{
+				Console.Write("{0} ", p);
+			}
+
+			Console.Write(commons);
+
+		}
+
 	}
 }

@@ -11,16 +11,13 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 
+using static Holdem.Core.Internal.DECK;
 using static System.Math;
 
 namespace Holdem.Core.Internal
 {
 	internal static class HAND
 	{
-		
-
-
-
 		public static Vector512<uint> Evaluate(ReadOnlySpan<Pocket> players, Card flop1, Card flop2, Card flop3, Card turn, Card river)
 		{
 			int n = players.Length;

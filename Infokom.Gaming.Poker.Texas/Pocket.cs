@@ -7,14 +7,11 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Infokom.Gaming.Poker.Texas
 {
-	public interface IPlayer<TPocket>
-	{
-		
-	}
 
 
 

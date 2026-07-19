@@ -91,16 +91,16 @@ namespace Holdem.Core.Internal
 				var pocketCards = localState.GeTPocketCards();
 				// TËRHEQJA E BORDIT
 				var deck = new Deck();
-				deck.Exclude(localState.GeTPocketCards());
+				deck.Remove(pocketCards);
 
 				Span<Card> boardCards = stackalloc Card[5];
 				deck.DrawTo(localState.Rng, boardCards, 5);
 
-				deck.TryDraw(localState.Rng, out var flop1);
-				deck.TryDraw(localState.Rng, out var flop2);
-				deck.TryDraw(localState.Rng, out var flop3);
-				deck.TryDraw(localState.Rng, out var turn);
-				deck.TryDraw(localState.Rng, out var river);
+				_ = deck.TryDraw(localState.Rng, out var flop1);
+				_ = deck.TryDraw(localState.Rng, out var flop2);
+				_ = deck.TryDraw(localState.Rng, out var flop3);
+				_ = deck.TryDraw(localState.Rng, out var turn);
+				_ = deck.TryDraw(localState.Rng, out var river);
 
 				Vector512<uint> handRank = HAND.Evaluate(localState.PocketsBuffer, boardCards[0], boardCards[1], boardCards[2], boardCards[3], boardCards[4]);
 				
@@ -182,10 +182,10 @@ namespace Holdem.Core.Internal
 						throw new ArgumentException($"Players {i} and {j} have overlapping pockets.");
 					}
 
-					deck.Exclude((Cards)pj.ID);
+					deck.Remove(pj.Cards);
 				}
 
-				deck.Exclude((Cards)pi.ID);
+				deck.Remove(pi.Cards);
 			}
 
 			var deckSize = deck.Count;

@@ -381,7 +381,7 @@ namespace Infokom.Gaming.Poker.Atomics
 				}
 			}
 
-			public ReadOnlySpan<char> Symbol => new[] { source.Rank.Symbol, source.Suit.Symbol };
+			public string Symbol => $"{source.Rank.Symbol}{source.Suit.Symbol}";
 
 
 
@@ -424,17 +424,47 @@ namespace Infokom.Gaming.Poker.Atomics
 
 		extension(Card)
 		{
-
+			
 			public static ImmutableArray<Card> Values => VALUES;
 
 
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static int IndexOf(Rank r, Suit s) => Rank.IndexOf(r) + Suit.IndexOf(s) * Rank.Count;
 
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static int IndexOf(Card c)
+			{
+				var (r, s) = c;
+
+				return Card.IndexOf(r, s);
+			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public static bool IndexOf(Card c, out int index) => (index = IndexOf(c)) >= 0;
 
 
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static Card Of(Rank r, Suit s) => (Card)((ushort)r | ((ushort)s << 8));
+
+
+			public static Card ValueOf(int index)
+			{
+				var r = index % Rank.Count;
+				var s = index / Rank.Count;
+
+				var rank = Rank.ValueOf(r);
+				var suit = Suit.ValueOf(s);
+
+				return Card.Of(rank, suit);
+			}
+
+			public static bool ValueOf(int index, out Card card) => (card = 
+				Rank.ValueOf(index % Rank.Count, out var r) && 
+				Suit.ValueOf(index / Rank.Count, out var s)
+				? Card.Of(r, s) : default) != default;
+
 
 
 

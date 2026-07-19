@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace Infokom.Gaming.Poker.Atomics
 {
-
+	[Flags]
 	public enum Cards : ulong
 	{
 		NONE				= 0,
