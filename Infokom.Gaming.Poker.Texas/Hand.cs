@@ -1,144 +1,169 @@
-﻿using Infokom.Gaming.Poker.Atomics;
-using Infokom.Numerics;
+﻿using Infokom.Gaming.Poker.Texas.Internal;
+using Infokom.Numerics.Atomics;
 
 using System.Collections;
-using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
-using static System.Diagnostics.Activity;
 
 namespace Infokom.Gaming.Poker.Texas
 {
-	
 
-	public class Hand : IObserver<Card>, IReadOnlyList<CardSpectrum>
+	[StructLayout(LayoutKind.Explicit)]
+	public readonly partial struct Hand
 	{
-		public enum Streets
+		[FieldOffset(0)] private readonly InlineArray4<ushort> _data;
+
+		[FieldOffset(0)] public readonly Cards Cards;
+		[FieldOffset(0)] public readonly Ranks S;
+		[FieldOffset(2)] public readonly Ranks D;
+		[FieldOffset(4)] public readonly Ranks C;
+		[FieldOffset(6)] public readonly Ranks H;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private Hand(InlineArray4<ushort> data) => _data = data;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public Hand(Cards data) => Cards = data;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public Hand(Ranks s, Ranks d, Ranks h, Ranks c) => (S, D, H, C) = (s, d, h, c);
+
+
+		public int Count
 		{
-			/// <summary>
-			/// All players has already received two face-down hole cards.
-			/// </summary>
-			PreFlop = 0b000001,
-
-			/// <summary>
-			/// Starts when the three community cards are face-up in the center of the table.
-			/// </summary>
-			Flop = 0b001110,
-
-			/// <summary>
-			/// Starts when the fourth community card is face-up
-			/// </summary>
-			Turn = 0b010000,
-
-			/// <summary>
-			/// Starts when the fifth community card is face-up
-			/// </summary>
-			River = 0b100000,
-
-			HasFlop = Flop | Turn | River,
-			HasTurn = Turn | River,
-			HasRiver = River,
-		}
-
-		private readonly CardSequence[] _dealt;
-
-		private Hand(CardSequence[] dealtCards)
-		{
-			this._dealt = dealtCards;
-		}
-
-		public Hand(int playersCount)
-		{
-			_dealt = new CardSequence[playersCount + 1];
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Cards.Count;
 		}
 
 
-		public Streets Street { get; private set; }
-
-		
-
-		public void OnNext(Card value) 
+		public override string ToString()
 		{
-			//ndahen fillimisht letrat lojetareve
-			//pastaj shtrohe bordi
-			throw new NotImplementedException();
-		}
 
-		void IObserver<Card>.OnError(Exception error) => throw new NotImplementedException();
-		
-		
-		public void OnCompleted() 
-		{
-			Array.Clear(_dealt);
+			var buffer = new string[Cards.Count];
 
-			var seg = new ArraySegment<CardSequence>(_dealt, 0, _dealt.Length - 1);
-			seg.AsReadOnly();
-		}
-
-
-		public IReadOnlyList<CardSequence> Pockets => new ArraySegment<CardSequence>(_dealt, 0, _dealt.Length - 1);
-		public CardSequence Board => _dealt[^1];
-
-
-		#region IReadOnlyList<CardSpectrum>
-		public int Count => _dealt.Length - 1;
-
-		public CardSpectrum this[int index]
-		{
-			get
+			int i = 0;
+			foreach (var card in Cards.OrderByRankDescending())
 			{
-				if((uint)index < _dealt.Length - 1)
+				buffer[i++] = card.Symbol;
+			}
+
+			return "[" + string.Join(", ", buffer) + "]";
+		}
+
+
+
+
+
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Hand Create(params ReadOnlySpan<Card> cards)
+		{
+			//TO DO: check cardinality
+
+			return new(Cards.Select(cards));
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Hand Create(Pocket pocket, Board board)
+		{
+			//TO DO: check cardinality
+
+			return new(pocket.Cards | board.Cards);
+		}
+
+		private const string PATTERN = @"\[(?<cards>([2-9TJQKA][sdch],[ ]*)*([2-9TJQKA][sdch]))\]";
+		public static Hand Parse(string source)
+		{
+			ArgumentNullException.ThrowIfNull(source);
+
+			if (!TryParse(source, out var target))
+			{
+				throw new FormatException($"The string '{source}' was not recognized as a valid Hand.");
+			}
+
+			return target;
+		}
+
+
+
+		public static bool TryParse(string source, out Hand target)
+		{
+			if (!string.IsNullOrWhiteSpace(source))
+			{
+				var match = Regex.Match(source, PATTERN);
+
+				if (match.Success)
 				{
-					var pocket = _dealt[index].ToSpectrum();
-					var common = _dealt[^1].ToSpectrum();
+					var cards = Cards.Φ;
 
-					return pocket | common;
+					foreach (var c in match.Groups["cards"].Value.Split(',', StringSplitOptions.TrimEntries))
+					{
+						cards = cards.Include(Rank.Cast(c[0], 0) * Suit.Cast(c[1], 0));
+					}
+
+					target = new(cards);
+					return true;
 				}
-
-				return CardSpectrum.Empty;
-			}
-		}
-
-		public IEnumerator<CardSpectrum> GetEnumerator()
-		{
-			var n = _dealt.Length - 1;
-
-			var common = _dealt[n].ToSpectrum();
-			for (int i = 0; i < n; i++)
-			{
-				yield return _dealt[i].ToSpectrum() | common;
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<CardSpectrum>)this).GetEnumerator();
-		#endregion
-
-
-		
-
-
-
-
-		public static Hand Create(int playerCount, Func<int, Card> dealer)
-		{
-			ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playerCount, nameof(playerCount));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(playerCount, 10, nameof(playerCount));
-
-			int n = playerCount;
-
-			//last cell is the board
-			var dealtCards = new CardSequence[n + 1];
-
-			
-			for (int i = 0; i < n; i++)
-			{
-				dealtCards[i] = (dealer(i), dealer(i + n));
 			}
 
-			dealtCards[n] = (dealer(2 * n), dealer(2 * n + 1), dealer(2 * n + 2), dealer(2 * n + 3), dealer(2 * n + 4));
-
-			return new(dealtCards);
+			target = default;
+			return false;
 		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
+	public readonly partial struct Hand : IReadOnlyList<Card>
+	{
+		Card IReadOnlyList<Card>.this[int index] => throw new NotImplementedException();
 
+		IEnumerator<Card> IEnumerable<Card>.GetEnumerator() => throw new NotImplementedException();
+		IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+	}
 }

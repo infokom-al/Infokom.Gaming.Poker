@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
-
-	
+	<PropertyGroup>
+		<TargetFramework>net11.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Infokom.Gaming.Poker\Infokom.Gaming.Poker.csproj" />
-	  <ProjectReference Include="..\Infokom.Numerics\Infokom.Numerics.csproj" />
+		<ProjectReference Include="..\Infokom.Gaming.Poker\Infokom.Gaming.Poker.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="Infokom.Gaming.Poker.Texas.Benchmarks"/>
+	</ItemGroup>
 </Project>

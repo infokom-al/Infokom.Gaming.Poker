@@ -1,13 +1,123 @@
-﻿using System.Collections;
+﻿using Infokom.Numerics.Atomics;
+
+using System.Collections;
+using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Infokom.Numerics
 {
+
+	public interface IVectorial<TVector> where TVector : IVectorial<TVector>
+	{
+		public static abstract Size<sbyte> Size { get; }
+	}
+
+	public interface IVectorial<TVector, TElement> : IVectorial<TVector>, IReadOnlyList<TElement> where TVector : IVectorial<TVector, TElement>
+	{
+		public struct Enumerator : IEnumerator<TElement>
+		{
+			private readonly TVector _owner;
+			private sbyte _offset;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public Enumerator(TVector owner)
+			{
+				_owner = owner;
+				_offset = -1;
+			}
+
+			public readonly TElement Current
+			{
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				get => TVector.Extract(_owner, _offset);
+			}
+
+			readonly object IEnumerator.Current => this.Current;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public bool MoveNext() => (++_offset) < TVector.Size;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public void Reset() => _offset = -1;
+
+			readonly void IDisposable.Dispose() => _ = false;
+
+		}
+
+
+		public new virtual Enumerator GetEnumerator() => new((TVector)this);
+		int IReadOnlyCollection<TElement>.Count => TVector.Size.X;
+		IEnumerator<TElement> IEnumerable<TElement>.GetEnumerator() => this.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+
+		public static abstract bool TryExtract(TVector source, int offset, out TElement target);
+		public static abstract TElement Extract(TVector source, int offset);
+
+		public static abstract bool TryIsolate(TVector source, int offset, out TVector target);
+		public static abstract TVector Isolate(TVector source, int offset);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public interface IVector<T>
+	{
+		public int Size { get; }
+
+		public T this[int index] { get; }
+	}
+
+	public class Vector<T>
+	{
+		private readonly Array _data;
+		private readonly int _offset;
+		private readonly int _length;
+
+		private Vector(Array data)
+		{
+			ArgumentNullException.ThrowIfNull(data, nameof(data));
+
+			this._data = data;
+		}
+
+		public int Size => _length;
+
+		public T this[int i] => (T)_data.GetValue(i + _offset);
+
+
+		public static Vector<T> Create(int size) => Create(size, null);
+
+		public static Vector<T> Create(int size, T value) => Create(size, i => value);
+
+		public static Vector<T> Create(int size, Func<int, T> source)
+		{
+			var data = Array.CreateInstance(typeof(T), size);
+
+			if (source != null)
+			{
+				for (int i = 0; i < size; i++)
+				{
+					data.SetValue(source(i), i);
+				}
+			}
+
+			return new Vector<T>(data);
+		}
+	}
+
 
 	public static class Vector
 	{
@@ -43,10 +153,10 @@ namespace Infokom.Numerics
 			}
 
 
-			public static TScalar[] operator+(ReadOnlySpan<TScalar> v1, ReadOnlySpan<TScalar> v2)
+			public static TScalar[] operator +(ReadOnlySpan<TScalar> v1, ReadOnlySpan<TScalar> v2)
 			{
 				ArgumentOutOfRangeException.ThrowIfNotEqual(v1.Length, v2.Length, "Array dimension mismatch.");
-				
+
 				var n = v1.Length;
 
 				var v = new TScalar[n];
@@ -60,7 +170,7 @@ namespace Infokom.Numerics
 							ptr[i] = ptr1[i] + ptr2[i];
 						}
 					}
-				}			
+				}
 
 				return v;
 			}
@@ -119,7 +229,7 @@ namespace Infokom.Numerics
 
 				var c = new TScalar[n];
 
-				
+
 
 				unsafe
 				{
@@ -501,6 +611,4 @@ namespace Infokom.Numerics
 			}
 		}
 	}
-
-
 }

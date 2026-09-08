@@ -1,10 +1,7 @@
 ﻿namespace Infokom.Numerics
 {
-	public interface ISelection<TSelection, TElement> : ISelection<TSelection>, IReadOnlyCollection<TElement> where TSelection : ISelection<TSelection, TElement>
-	{	
-
-
-		
-		public static abstract TSelection Select(TElement element);
+	public interface ISelection<TSelection, TOption> : ISelection<TSelection>, IReadOnlyCollection<TOption> where TSelection : ISelection<TSelection, TOption>
+	{
+		public static abstract TSelection Select(TOption option);
 	}
 }

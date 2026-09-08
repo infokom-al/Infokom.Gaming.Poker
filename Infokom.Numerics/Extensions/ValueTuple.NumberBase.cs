@@ -6,29 +6,29 @@ namespace Infokom.Numerics.Operators
 	{
 		extension(ValueTuple)
 		{
-			public static ValueTuple<T1> Zero<T1>()	where T1 : INumberBase<T1> => ValueTuple.Create(T1.Zero);
-			public static ValueTuple<T1, T2> Zero<T1, T2>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> => ValueTuple.Create(T1.Zero, 	T2.Zero);
+			public static ValueTuple<T1> Zero<T1>() where T1 : INumberBase<T1> => ValueTuple.Create(T1.Zero);
+			public static ValueTuple<T1, T2> Zero<T1, T2>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> => ValueTuple.Create(T1.Zero, T2.Zero);
 			public static ValueTuple<T1, T2, T3> Zero<T1, T2, T3>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero);
-			public static ValueTuple<T1, T2, T3, T4, T5> Zero<T1, T2, T3, T4, T5>() where T1 : INumberBase<T1>	where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> => ValueTuple.Create(T1.Zero,T2.Zero,T3.Zero,T4.Zero,T5.Zero);
-			public static ValueTuple<T1, T2, T3, T4, T5, T6> Zero<T1, T2, T3, T4, T5, T6>()	where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero, T4.Zero, T5.Zero, T6.Zero);
-			public static ValueTuple<T1, T2, T3, T4, T5, T6, T7> Zero<T1, T2, T3, T4, T5, T6, T7>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> where T7 : INumberBase<T7> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero, T4.Zero,T5.Zero, T6.Zero, T7.Zero);
-		
+			public static ValueTuple<T1, T2, T3, T4, T5> Zero<T1, T2, T3, T4, T5>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero, T4.Zero, T5.Zero);
+			public static ValueTuple<T1, T2, T3, T4, T5, T6> Zero<T1, T2, T3, T4, T5, T6>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero, T4.Zero, T5.Zero, T6.Zero);
+			public static ValueTuple<T1, T2, T3, T4, T5, T6, T7> Zero<T1, T2, T3, T4, T5, T6, T7>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> where T7 : INumberBase<T7> => ValueTuple.Create(T1.Zero, T2.Zero, T3.Zero, T4.Zero, T5.Zero, T6.Zero, T7.Zero);
+
 
 			public static ValueTuple<T1> One<T1>() where T1 : INumberBase<T1> => ValueTuple.Create(T1.One);
 			public static ValueTuple<T1, T2> One<T1, T2>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> => ValueTuple.Create(T1.One, T2.One);
 			public static ValueTuple<T1, T2, T3> One<T1, T2, T3>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> => ValueTuple.Create(T1.One, T2.One, T3.One);
 			public static ValueTuple<T1, T2, T3, T4, T5> One<T1, T2, T3, T4, T5>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> => ValueTuple.Create(T1.One, T2.One, T3.One, T4.One, T5.One);
 			public static ValueTuple<T1, T2, T3, T4, T5, T6> One<T1, T2, T3, T4, T5, T6>() where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> => ValueTuple.Create(T1.One, T2.One, T3.One, T4.One, T5.One, T6.One);
-		
+
 			public static ValueTuple<T1> Abs<T1>(ValueTuple<T1> a) where T1 : INumberBase<T1> => ValueTuple.Create(T1.Abs(a.Item1));
 			public static ValueTuple<T1, T2> Abs<T1, T2>(ValueTuple<T1, T2> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> => ValueTuple.Create(T1.Abs(a.Item1), T2.Abs(a.Item2));
 			public static ValueTuple<T1, T2, T3> Abs<T1, T2, T3>(ValueTuple<T1, T2, T3> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> => ValueTuple.Create(T1.Abs(a.Item1), T2.Abs(a.Item2), T3.Abs(a.Item3));
 			public static ValueTuple<T1, T2, T3, T4, T5> Abs<T1, T2, T3, T4, T5>(ValueTuple<T1, T2, T3, T4, T5> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> => ValueTuple.Create(T1.Abs(a.Item1), T2.Abs(a.Item2), T3.Abs(a.Item3), T4.Abs(a.Item4), T5.Abs(a.Item5));
 			public static ValueTuple<T1, T2, T3, T4, T5, T6> Abs<T1, T2, T3, T4, T5, T6>(ValueTuple<T1, T2, T3, T4, T5, T6> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> => ValueTuple.Create(T1.Abs(a.Item1), T2.Abs(a.Item2), T3.Abs(a.Item3), T4.Abs(a.Item4), T5.Abs(a.Item5), T6.Abs(a.Item6));
 			public static ValueTuple<T1, T2, T3, T4, T5, T6, T7> Abs<T1, T2, T3, T4, T5, T6, T7>(ValueTuple<T1, T2, T3, T4, T5, T6, T7> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> where T4 : INumberBase<T4> where T5 : INumberBase<T5> where T6 : INumberBase<T6> where T7 : INumberBase<T7> => ValueTuple.Create(T1.Abs(a.Item1), T2.Abs(a.Item2), T3.Abs(a.Item3), T4.Abs(a.Item4), T5.Abs(a.Item5), T6.Abs(a.Item6), T7.Abs(a.Item7));
-		
 
-			
+
+
 			public static ValueTuple<bool> IsNegative<T1>(ValueTuple<T1> a) where T1 : INumberBase<T1> => ValueTuple.Create(T1.IsNegative(a.Item1));
 			public static ValueTuple<bool, bool> IsNegative<T1, T2>(ValueTuple<T1, T2> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> => ValueTuple.Create(T1.IsNegative(a.Item1), T2.IsNegative(a.Item2));
 			public static ValueTuple<bool, bool, bool> IsNegative<T1, T2, T3>(ValueTuple<T1, T2, T3> a) where T1 : INumberBase<T1> where T2 : INumberBase<T2> where T3 : INumberBase<T3> => ValueTuple.Create(T1.IsNegative(a.Item1), T2.IsNegative(a.Item2), T3.IsNegative(a.Item3));
@@ -131,5 +131,5 @@ namespace Infokom.Numerics.Operators
 		}
 	}
 
-	
+
 }

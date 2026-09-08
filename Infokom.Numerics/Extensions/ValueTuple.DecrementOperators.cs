@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Infokom.Numerics.Operators
+namespace Infokom.Numerics.Extensions
 {
 	public static partial class DecrementOperators
 	{

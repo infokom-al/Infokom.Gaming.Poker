@@ -17,3 +17,12 @@ dotnet_diagnostic.IDE0046.severity = silent
 
 # IDE0045: Convert to conditional expression
 dotnet_diagnostic.IDE0045.severity = silent
+
+# IDE2005: Blank line not allowed after conditional expression token
+dotnet_diagnostic.IDE2005.severity = silent
+
+# IDE2006: Blank line not allowed after arrow expression clause token
+dotnet_diagnostic.IDE2006.severity = silent
+
+# IDE0018: Inline variable declaration
+dotnet_diagnostic.IDE0018.severity = silent

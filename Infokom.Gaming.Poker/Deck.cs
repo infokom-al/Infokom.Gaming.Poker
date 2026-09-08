@@ -1,118 +1,203 @@
-﻿using Infokom.Gaming.Poker.Atomics;
 using Infokom.Numerics;
-using Infokom.Numerics.Attributes;
+using Infokom.Numerics.Extensions;
 
-using System.Collections.Immutable;
+using System.Collections;
 using System.Numerics;
-using System.Xml.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 
-using static Infokom.Gaming.Poker.Deck;
 
 namespace Infokom.Gaming.Poker
 {
-
-	public class Deck
+	[StructLayout(LayoutKind.Explicit, Size = 8)]
+	public struct Deck
 	{
-		private Cards _cards;
+		private const ushort RANKING_MASK = 0x7FFC;
+
+		private const ulong FACTORY_MASK = 0x7FFC7FFC7FFC7FFCUL;
+
+		private const ulong SHUFFLED_FLAG = 1UL;
+
+		[FieldOffset(0)] private ulong _binary;
+		[FieldOffset(0)] private readonly ushort _s;
+		[FieldOffset(2)] private readonly ushort _d;
+		[FieldOffset(4)] private readonly ushort _c;
+		[FieldOffset(6)] private readonly ushort _h;
 
 
-		public Deck()
+
+		[FieldOffset(0)] public readonly Cards State;
+
+
+		private Deck(ulong binary) : this() => _binary = binary;
+
+		
+
+		public readonly int Count => BitOperations.PopCount(_binary & FACTORY_MASK);
+
+		public readonly bool IsEmpty => (_binary & FACTORY_MASK) == 0;
+
+		public readonly bool IsComplete => (_binary & FACTORY_MASK) == FACTORY_MASK;
+
+		public readonly bool IsShuffled => (_binary & SHUFFLED_FLAG) != 0;
+
+		public void Shuffle()
 		{
-			_cards = Cards.ALL;
+			if (!IsComplete)
+				throw new InvalidOperationException(
+				    "The deck can only be shuffled when all cards are present.");
+
+			_binary = FACTORY_MASK | SHUFFLED_FLAG;
 		}
-
-		public bool IsEmpty => _cards.IsEmpty;
-
-		public int Count => _cards.Count;
-
-
-		public bool Contains(Card card) => _cards.IsIncluded(card);
-
-
-		public bool TryDraw(Random random, out Card card)
-		{
-			card = this.TryDraw(random, out int index) ? Card.Values[index] : default;
-
-			return card != default;
-		}
-
-		public Card Draw(Random random) => this.TryDraw(random, out int index) ? Card.Values[index] : throw new InvalidOperationException("Empty deck");
-
 
 		/// <summary>
-		/// 
+		/// Restores the deck to factory order, which is the order in which the cards were originally arranged.
 		/// </summary>
-		/// <param name="rand"></param>
-		/// <param name="target"></param>
-		/// <param name="count"></param>
-		/// <param name="offset"></param>
-		/// <returns>Number of drwn elements</returns>
-		public void DrawTo(Random rand, Card[] target, int count, int offset = 0)
+		/// <exception cref="InvalidOperationException"></exception>
+		/// <remarks>
+		/// We are following ordering according to <see href="https://en.wikipedia.org/wiki/Standard_52-card_deck#New-deck_order_(NDO)">New-deck order (NDO)</see>
+		/// with a single difference about aces being the upmost instead of lowest as in NDO.
+		/// </remarks>
+		public void Reorder()
 		{
-			ArgumentNullException.ThrowIfNull(target, nameof(target));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(count, _cards.Count);
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + count, target.Length);
+			if (!IsComplete)
+				throw new InvalidOperationException(
+				    "The deck can only be restored to factory order when all cards are present.");
 
-
-			for (int i = 0; i < count; i++)
-			{
-				target[i + offset] = this.Draw(rand);
-			}
+			_binary = FACTORY_MASK;
 		}
 
-		public void DrawTo(Random rand, Span<Card> target, int count, int offset = 0)
+		internal readonly bool Contains(Card card) => _binary.BitTest((int)card);
+
+
+
+
+
+
+
+
+		internal readonly Card Peek()
 		{
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(count, _cards.Count);
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(offset + count, target.Length);
+			ulong binary = _binary & FACTORY_MASK;
 
+			if (binary == 0)
+				throw new InvalidOperationException("The deck is empty.");
 
-			for (int i = 0; i < count; i++)
+			int offset = IsShuffled ? binary.BitScanShuffle() : binary.BitScanForward();
+			
+			return (Card)offset;
+		}
+
+		public readonly bool TryPeek(out Card card)
+		{
+			ulong binary = _binary & FACTORY_MASK;
+			if (binary == 0)
 			{
-				target[i + offset] = this.Draw(rand);
+				card = default;
+				return false;
 			}
+			int offset = IsShuffled ? binary.BitScanShuffle() : binary.BitScanForward();
+
+			card = (Card)offset;
+			return true;
+		}
+		
+		public Card Pop()
+		{
+			if (TryPeek(out Card card))
+			{
+				_binary = _binary.BitClear((int)card);
+				return card;
+			}
+			throw new InvalidOperationException("The deck is empty.");
+		}
+
+		public bool TryPop(out Card card)
+		{
+			if (TryPeek(out card))
+			{
+				_binary = _binary.BitClear((int)card);
+				return true;
+			}
+
+			return false;
+		}
+
+		internal void Remove(Card card)
+		{
+			_binary = _binary.BitClear((int)card);
 		}
 
 
 
-		public void Remove(Card element) => this.Remove(Cards.Select(element));
-		public void Remove(params ReadOnlySpan<Card> elements) => this.Remove(Cards.Select(elements));
-		internal void Remove(Cards elements)
+
+
+
+		public static readonly Deck Empty = default;
+		public static readonly Deck Factory = new(FACTORY_MASK);
+
+		internal void Push(Card card) => throw new NotImplementedException();
+	}
+
+	public struct Hand
+	{
+		private ulong _bits;
+
+		public readonly int Count =>
+		    BitOperations.PopCount(_bits);
+
+		public readonly bool IsEmpty =>
+		    _bits == 0;
+
+		public readonly bool IsFull =>
+		    Count == 5;
+
+		internal readonly bool Contains(Card card)
 		{
-			_cards |= ~elements;
+			ulong flag = 1UL << (int)card;
+			return (_bits & flag) != 0;
 		}
 
-		private bool TryDraw(Random random, out int index)
+		internal readonly bool CanAccept(Card card)
 		{
-			index = -1;
+			return !IsFull && !Contains(card);
+		}
 
-			if (!_cards.IsEmpty)
+		internal void Accept(Card card)
+		{
+			_bits |= 1UL << (int)card;
+		}
+	}
+
+	public readonly struct Dealer
+	{
+		public static readonly Dealer Default = new();
+
+		public void Draw(ref Deck source, ref Hand target)
+		{
+			if (!TryDraw(ref source, ref target))
+				throw new InvalidOperationException(
+				    "The draw operation cannot be completed.");
+		}
+
+		public bool TryDraw(ref Deck source, ref Hand target)
+		{
+			if (source.IsEmpty)
+				return false;
+
+			Card card = source.Pop();
+
+			if (target.CanAccept(card))
 			{
-				// 1. Zgjedhim indeksin e bitit të ndezur që duam të tërheqim
-				index = random.Next(_cards.Count);
-
-				// 2. Truku Branchless duke përdorur BMI2 (Hardware Accelerated)
-				// Pdep (Parallel Deposit) vendos bitin e parë të ndezur të '1UL << targetIndex' 
-				// saktësisht te biti i N-të i ndezur i maskës sonë '_deck'.
-				Cards bitToClear;
-				if (System.Runtime.Intrinsics.X86.Bmi2.X64.IsSupported)
-				{
-					bitToClear = (Cards)System.Runtime.Intrinsics.X86.Bmi2.X64.ParallelBitDeposit(1UL << index, (ulong)_cards);
-				}
-				else
-				{
-					// Versioni fallback pa cikle të gjata nëse BMI2 nuk mbështetet (Software alternative e shpejtë)
-					Cards temp = _cards;
-					for (int i = 0; i < index; i++) temp &= (Cards)(temp - 1);
-					bitToClear = (Cards)((ulong)temp & (ulong)(-(long)(ulong)temp)); // Izolon bitin më të ulët të mbetur
-				}
-
-				index = BitOperations.TrailingZeroCount((ulong)bitToClear);
-
-
-				_cards &= (~bitToClear);//deleting card at index
+				target.Accept(card);
+				return true;
 			}
-
-			return index != -1;
+			else
+			{
+				source.Push(card);
+				return false;
+			}
 		}
 
 	}

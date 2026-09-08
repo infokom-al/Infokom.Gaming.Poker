@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.Options;
+
 using System.Collections.Immutable;
-using System.Text;
 
 namespace Infokom.Numerics.Atomics
 {
@@ -663,4 +662,5 @@ namespace Infokom.Numerics.Atomics
 			public static ImmutableArray<ASCII> UppercaseLetters => UPPERCASE_LETTERS;
 		}
 	}
+
 }

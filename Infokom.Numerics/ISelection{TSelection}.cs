@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Infokom.Numerics
+﻿namespace Infokom.Numerics
 {
 	/// <summary>
 	/// 

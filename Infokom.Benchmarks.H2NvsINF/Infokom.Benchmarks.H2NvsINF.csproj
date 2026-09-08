@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net11.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="BenchmarkDotNet" Version="0.16.0-preview.1" />
+	  <PackageReference Include="BenchmarkDotNet.Annotations" Version="0.16.0-preview.1" />
+	  <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.16.0-preview.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Infokom.Gaming.Poker.Texas\Infokom.Gaming.Poker.Texas.csproj" />
+		<ProjectReference Include="..\Poker.Calc\Poker.Calc.csproj" />
+	</ItemGroup>
+
+</Project>

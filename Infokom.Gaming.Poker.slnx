@@ -2,21 +2,42 @@
   <Configurations>
     <Platform Name="Any CPU" />
     <Platform Name="x64" />
+    <Platform Name="x86" />
   </Configurations>
   <Folder Name="/Apps/" />
-  <Folder Name="/Apps/CLI/">
-    <Project Path="TexasHandEvaluator/TexasHandEvaluator.csproj" Id="d11a5801-0fb6-4709-b6c8-631d0650fc6b" />
-  </Folder>
+  <Folder Name="/Apps/CLI/" />
   <Folder Name="/Apps/GUI/" />
   <Folder Name="/Apps/WEB/" />
+  <Folder Name="/Hand2Note/">
+    <Project Path="BinarySerializer/BinarySerializer.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="CSharpSerializer/CSharpSerializer.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="Hand2NoteCore.HandStrength/Hand2NoteCore.HandStrength.csproj" />
+    <Project Path="MemoryPools/MemoryPools.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="Poker.Calc.Benchmarks/Poker.Calc.Benchmarks.csproj" Id="4b293e2a-1e46-439f-8856-7fc36acef073">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+    <Project Path="Poker.Calc/Poker.Calc.csproj">
+      <Platform Solution="*|x86" Project="x86" />
+    </Project>
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="Infokom.Gaming.Poker.Texas/Infokom.Gaming.Poker.Texas.csproj">
-    <Platform Solution="*|x64" Project="x64" />
-  </Project>
-  <Project Path="Infokom.Gaming.Poker/Infokom.Gaming.Poker.csproj" Id="1634ef90-e113-4737-9ffe-347004bedab6" />
+  <Project Path="Infokom.Gaming.Poker.Benchmarks/Infokom.Gaming.Poker.Benchmarks.csproj" Id="dec7c6ec-7380-4aa0-80d7-b29d1a297d58" />
+  <Project Path="Infokom.Gaming.Poker.Tests/Infokom.Gaming.Poker.Tests.csproj" Id="f328a560-52aa-4ef0-bfb6-39b3d6eed804" />
+  <Project Path="Infokom.Gaming.Poker.Texas.Benchmarks/Infokom.Gaming.Poker.Texas.Benchmarks.csproj" Id="aece278a-7947-41f5-9a3a-0fddbad2a38a" />
+  <Project Path="Infokom.Gaming.Poker.Texas.Tests/Infokom.Gaming.Poker.Texas.Tests.csproj" />
+  <Project Path="Infokom.Gaming.Poker.Texas/Infokom.Gaming.Poker.Texas.csproj" Id="08f807b9-0a5c-4b2b-9823-bd6db5f2c4cf" />
+  <Project Path="Infokom.Gaming.Poker/Infokom.Gaming.Poker.csproj" Id="823209f3-c4c3-421c-8fc4-a7465a9b00a0" />
+  <Project Path="Infokom.Numerics.Benchmarks/Infokom.Numerics.Benchmarks.csproj" Id="ad3f9fb7-e944-4fd5-b698-e4021136a8f6" />
   <Project Path="Infokom.Numerics/Infokom.Numerics.csproj" Id="14d6f72c-11e4-4114-b5d2-c614cf5891a9">
-    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Release|x64" Project="x64" />
   </Project>
 </Solution>

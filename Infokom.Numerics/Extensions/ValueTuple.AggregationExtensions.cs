@@ -1,4 +1,4 @@
-﻿namespace Infokom.Numerics.Operators
+﻿namespace Infokom.Numerics.Extensions
 {
 	public static class AggregationOperations
 	{
@@ -26,7 +26,7 @@
 				return x;
 			}
 		}
-		
+
 		extension<T>(ValueTuple<T, T, T, T> source)
 		{
 			public T Aggregate(Func<T, T, T> aggregator)
@@ -77,7 +77,7 @@
 			public T Aggregate(Func<T, T, T> aggregator)
 			{
 				var (x, x1, x2, x3, x4, x5, x6) = source;
-				
+
 				x = aggregator(x, x1);
 				x = aggregator(x, x2);
 				x = aggregator(x, x3);
@@ -112,7 +112,7 @@
 
 		extension(ValueTuple<ulong, ulong, ulong, ulong, ulong, ulong, ulong> source)
 		{
-			
+
 		}
 	}
 }

@@ -19,9 +19,14 @@
 
 			int i = 0;
 			foreach (var element in source)
-				tokens[i++] = element.ToString(elementFormat, elementFormatProvider); 
+				tokens[i++] = element.ToString(elementFormat, elementFormatProvider);
 
 			return string.Join(elementSeparator, tokens);
+		}
+
+		public static void Foo(int[,] source)
+		{
+			
 		}
 	}
 

@@ -1,98 +1,70 @@
-﻿using Infokom.Gaming.Poker.Atomics;
-using Infokom.Numerics.Extensions;
+﻿using Infokom.Numerics.Atomics;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Arm;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using Infokom.Gaming.Poker;
 
 namespace Infokom.Gaming.Poker.Texas
 {
-
-
-
-	
-	public readonly record struct Pocket
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly struct Pocket
 	{
-		private readonly Cards _cards;
-			
-		private Pocket(Cards cards) => _cards = cards;
+		private readonly Cards _data;
 
-		public Card this[int index] => index switch { 0 => _cards.First, 1 => _cards.Last, _ => throw new IndexOutOfRangeException() };
+		private Pocket(Cards cards) => _data = cards;
 
-		public bool IsPaired => this.Ranks.Count == 1;
-
-		public bool IsSuited => this.Suits.Count == 1;
-
-		public ulong ID => (ulong)_cards;
-
-
-		public Ranks Ranks => _cards.Ranks;
-
-		public Suits Suits => _cards.Suits;
-
-		public Cards Cards => _cards;
-
-
-
-		public void Deconstruct(out Card hi, out Card lo)
+		public Cards Cards
 		{
-			hi = _cards.First;
-			lo = _cards.Last;
-
-
-			var d = hi.Rank.Index.CompareTo(lo.Rank.Index);
-
-			if(d == 0)
-				d = hi.Suit.Index.CompareTo(lo.Suit.Index);
-
-			(hi, lo) = d > 0 ? (hi, lo) : (lo, hi);
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => _data;
 		}
 
 
-
-		public bool Contains(Card element) => element.IsKnown && this._cards.IsIncluded(element);
-
-		public bool Overlaps(Pocket other) => !(this._cards & other._cards).IsEmpty;
-
-
-		public override string ToString()
+		public void Deconstruct(out Card x, out Card y)
 		{
-			var (c1, c2) = this;
-			
+			//var up = CardSet.Select(_data.Ranks.Upmost());
+			//var lo = CardSet.Select(_data.Ranks.Lowest());
 
-			return $"[{c1.Symbol}, {c2.Symbol}]";
+
+			x = _data.Top();
+			y = _data.Exclude(x).Top();
+
+			(x, y) = (Card.Hi(x, y), Card.Lo(x, y));
 		}
 
-		public static Pocket Create(Card x, Card y)
+		public override string ToString() 
 		{
-			
-			return new Pocket(Cards.Select(x, y));
+			var (x, y) = this;
+			if (x < Math.Max(x.R, y.R)) (x, y) = (y, x);
+
+			return $"[{x.Symbol},{y.Symbol}]";
 		}
 
 
+		public static readonly Pocket Empty;
+
+		internal static Pocket Create(Cards cards) => new(cards);
 
 
 
+		public static implicit operator Pocket((Card X, Card Y) source) => new(Cards.Select(source.X, source.Y));
 
-		private const string PATTERN = @"^\[(?<pocket>((?<card>[23456789TJQKA][shdc])[, ]*){2})\]$";
-		public static Pocket Parse(string text)
+		public static implicit operator Cards(Pocket source) => source.Cards;
+		
+		private static readonly Regex REGEX = new(@"\[([2-9TJQKA][sdch]), ([2-9TJQKA][sdch])\]", RegexOptions.Compiled);
+
+		public static Pocket Parse(string source)
 		{
-			var match = Regex.Match(text, PATTERN);
+			var match = REGEX.Match(source);
+
 			if (!match.Success)
-			{
-				throw new ArgumentException($"Invalid text format '{text}'", nameof(text));
-			}
+				throw new FormatException();
 
-			var cards = match.Groups["card"].Captures.Select(c => Card.Parse(c.Value)).ToArray();
-
-			return Pocket.Create(cards[0], cards[1]);
+			return (X: Card.Parse(match.Groups[1].Value), Y: Card.Parse(match.Groups[2].Value));
 		}
-	}
 
-	
+
+		
+	}
 }
