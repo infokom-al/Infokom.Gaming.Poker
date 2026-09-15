@@ -50,125 +50,167 @@ namespace Infokom.Gaming.Poker.Texas
 					_seatIndex = index;
 				}
 
-				public long Score => _owner._scoreDistribution[_seatIndex];
+				public long SoleWins => _owner._soleWins[_seatIndex];
+				public long SharedWins => _owner._sharedWins[_seatIndex];
+				public long TopFinishes => _owner._topFinishes[_seatIndex];
+				public double EquityShare => _owner._equityShares[_seatIndex];
 
-				public double WinRate => _owner._scoreDistribution[_seatIndex] / (double)_owner._simulationCount;
+				public double SoleWinRate => _owner.SoleWinRateOf(_seatIndex);
+				public double SharedWinRate => _owner.SharedWinRateOf(_seatIndex);
+				public double TopFinishRate => _owner.TopFinishRateOf(_seatIndex);
+				public double WinRate => _owner.WinRateOf(_seatIndex);
 			}
 
-			private readonly long[] _scoreDistribution;
-			private readonly long _scoreSum;
+			private readonly long[] _soleWins;
+			private readonly long[] _sharedWins;
+			private readonly long[] _topFinishes;
+			private readonly double[] _equityShares;
 			private readonly long _simulationCount;
 
-			private Estimation(ulong id, long[] scoreDistribution, long count)
+			private Estimation(ulong id, long[] soleWins, long[] sharedWins, long[] topFinishes, double[] equityShares, long count)
 			{
 				Id = id;
-				_scoreDistribution = scoreDistribution;
-				_scoreSum = scoreDistribution.Sum();
+				_soleWins = soleWins;
+				_sharedWins = sharedWins;
+				_topFinishes = topFinishes;
+				_equityShares = equityShares;
 				_simulationCount = count;
 			}
 
 			public ulong Id { get; }
 
-			public int PlayerCount => _scoreDistribution.Length;
+			public int PlayerCount => _topFinishes.Length;
 
-			public long[] Wins => _scoreDistribution;
+			/// <summary>
+			/// Gets the number of times each player won the hand outright (without sharing the win with any other player).
+			/// </summary>
+			public long[] SoleWins => _soleWins;
+
+			/// <summary>
+			/// Gets the number of times each player won the hand, including shared wins (where multiple players had the same best hand).
+			/// </summary>
+			public long[] SharedWins => _sharedWins;
+
+			/// <summary>
+			/// Gets the number of times each player finished in the top position, regardless of whether they won outright or shared the win with other players.
+			/// </summary>
+			public long[] TopFinishes => _topFinishes;
+
+			/// <inheritdoc cref="TopFinishes"/>
+			public long[] Wins => _topFinishes;
+
+			/// <summary>
+			/// Gets the equity share for each player, which represents the proportion of the total simulations in which each player had the best hand (either outright or shared).
+			/// </summary>
+			public double[] EquityShares => _equityShares;
 
 			public long Size => _simulationCount;
 
-			public double WinRateOf(int player) => _scoreDistribution[player] / (double)_scoreSum;
+			public double WinRateOf(int player) => _simulationCount == 0 ? 0d : _equityShares[player] / _simulationCount;
+			public double SoleWinRateOf(int player) => _simulationCount == 0 ? 0d : _soleWins[player] / (double)_simulationCount;
+			public double SharedWinRateOf(int player) => _simulationCount == 0 ? 0d : _sharedWins[player] / (double)_simulationCount;
+			public double TopFinishRateOf(int player) => _simulationCount == 0 ? 0d : _topFinishes[player] / (double)_simulationCount;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static Estimation Estimate(Request request, bool monteCarlo = true)
 			{
-				if(monteCarlo)
+				if (monteCarlo)
 					return EstimateMonteCarlo(request);
 
 				int playerCount = request.Players.Length;
-				var wins = new long[playerCount];
+				var soleWins = new long[playerCount];
+				var sharedWins = new long[playerCount];
+				var topFinishes = new long[playerCount];
+				var equityShares = new double[playerCount];
 				long games = 0;
 
 				Deck deck = Deck.Factory;
 				CardSet available = deck.State;
 
-				var pockets = new CardSet[playerCount]; // preallocate once
-				EstimatePlayers(request.Players, 0, available, pockets, wins, ref games);
+				var pockets = new CardSet[playerCount];
+				EstimatePlayers(request.Players, 0, available, pockets, soleWins, sharedWins, topFinishes, equityShares, ref games);
 
-				return new Estimation(request.Id, wins, games);
+				return new Estimation(request.Id, soleWins, sharedWins, topFinishes, equityShares, games);
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private static void EstimatePlayers(ImmutableArray<GTO.Range> ranges, int player, CardSet available, CardSet[] pockets, long[] wins, ref long games)
-			{
-				if (player == ranges.Length)
-				{
-					// simple threshold; tune with profiling
-					if (available.Count >= 24) EstimateBoardsParallel(pockets, available, wins, ref games);
-					else EstimateBoards(pockets, available, wins, ref games);
-					return;
-				}
+			private static void EstimatePlayers(
+	ImmutableArray<GTO.Range> ranges,
+	int player,
+	CardSet available,
+	CardSet[] pockets,
+	long[] soleWins,
+	long[] sharedWins,
+	long[] topFinishes,
+	double[] equityShares,
+	ref long games)
+{
+	if (player == ranges.Length)
+	{
+		if (available.Count >= 24)
+			EstimateBoardsParallel(pockets, available, soleWins, sharedWins, topFinishes, equityShares, ref games);
+		else
+			EstimateBoards(pockets, available, soleWins, sharedWins, topFinishes, equityShares, ref games);
 
-				foreach (var cell in ranges[player].Cells)
-				{
-					foreach (CardSet pocket in cell.Hands)
-					{
-						if (!available.IsSupersetOf(pocket))
-							continue;
+		return;
+	}
 
-						pockets[player] = pocket;
-						EstimatePlayers(ranges, player + 1, available & ~pocket, pockets, wins, ref games);
-					}
-				}
-			}
+	foreach (var cell in ranges[player].Cells)
+	{
+		foreach (CardSet pocket in cell.Hands)
+		{
+			if (!available.IsSupersetOf(pocket))
+				continue;
+
+			pockets[player] = pocket;
+			EstimatePlayers(ranges, player + 1, available & ~pocket, pockets, soleWins, sharedWins, topFinishes, equityShares, ref games);
+		}
+	}
+}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private static void EstimateBoards(CardSet[] pockets, CardSet available, long[] wins, ref long games)
+			private static void EstimateBoards(
+	CardSet[] pockets,
+	CardSet available,
+	long[] soleWins,
+	long[] sharedWins,
+	long[] topFinishes,
+	double[] equityShares,
+	ref long games)
+{
+	foreach (CardSet board in available.Choose(5))
+	{
+		Hand.Ranking best = Hand.Evaluate(pockets[0] | board);
+		ulong winners = 1UL;
+
+		for (int player = 1; player < pockets.Length; player++)
+		{
+			Hand.Ranking value = Hand.Evaluate(pockets[player] | board);
+
+			if (value > best)
 			{
-				var combinations = available.Choose(5);
-
-				foreach (CardSet board in combinations)
-				{
-					Hand.Ranking best = Hand.Evaluate(pockets[0] | board);
-
-					ulong winners = 1UL;
-
-					for (int player = 1; player < pockets.Length; player++)
-					{
-						Hand.Ranking value = Hand.Evaluate(pockets[player] | board);
-
-						if (value > best)
-						{
-							best = value;
-							winners = 1UL << player;
-						}
-						else if (value == best)
-						{
-							winners |= 1UL << player;
-						}
-					}
-
-					games++;
-
-					while (winners != 0)
-					{
-						int player =
-						    BitOperations.TrailingZeroCount(winners);
-
-						wins[player]++;
-
-						winners &= winners - 1;
-					}
-				}
+				best = value;
+				winners = 1UL << player;
 			}
+			else if (value == best)
+			{
+				winners |= 1UL << player;
+			}
+		}
 
-			private static void EstimateBoardsParallel(CardSet[] pockets, CardSet available, long[] wins, ref long games)
+		AccumulateOutcome(winners, soleWins, sharedWins, topFinishes, equityShares, ref games);
+	}
+}
+
+			private static void EstimateBoardsParallel(CardSet[] pockets, CardSet available, long[] soleWins, long[] sharedWins, long[] topFinishes, double[] equityShares, ref long games)
 			{
 				int playerCount = pockets.Length;
 				object sync = new();
 				long totalGames = 0;
 
-				_ = System.Threading.Tasks.Parallel.ForEach(
+				_ = Parallel.ForEach(
 					available.Choose(5),
-					() => (Games: 0L, Wins: new long[playerCount]),
+					() => new LocalAccumulator(playerCount),
 					(board, _, local) =>
 					{
 						Hand.Ranking best = Hand.Evaluate(pockets[0] | board);
@@ -189,15 +231,7 @@ namespace Infokom.Gaming.Poker.Texas
 							}
 						}
 
-						local.Games++;
-
-						while (winners != 0)
-						{
-							int player = BitOperations.TrailingZeroCount(winners);
-							local.Wins[player]++;
-							winners &= winners - 1;
-						}
-
+						AccumulateOutcome(winners, local.SoleWins, local.SharedWins, local.TopFinishes, local.EquityShares, ref local.Games);
 						return local;
 					},
 					local =>
@@ -207,7 +241,12 @@ namespace Infokom.Gaming.Poker.Texas
 							totalGames += local.Games;
 
 							for (int i = 0; i < playerCount; i++)
-								wins[i] += local.Wins[i];
+							{
+								soleWins[i] += local.SoleWins[i];
+								sharedWins[i] += local.SharedWins[i];
+								topFinishes[i] += local.TopFinishes[i];
+								equityShares[i] += local.EquityShares[i];
+							}
 						}
 					});
 
@@ -226,7 +265,7 @@ namespace Infokom.Gaming.Poker.Texas
 
 				for (int p = 0; p < playerCount; p++)
 				{
-					System.Collections.Generic.List<CardSet> list = new(256);
+					List<CardSet> list = new(256);
 
 					foreach (var cell in request.Players[p].Cells)
 						foreach (var hand in cell.Hands)
@@ -245,7 +284,7 @@ namespace Infokom.Gaming.Poker.Texas
 
 					RunMonteCarlo(allHands, simulations, local);
 
-					return new Estimation(request.Id, local.Wins, local.Games);
+					return new Estimation(request.Id, local.SoleWins, local.SharedWins, local.TopFinishes, local.EquityShares, local.Games);
 				}
 
 				int workerCount = Math.Min(Environment.ProcessorCount, simulations);
@@ -267,7 +306,10 @@ namespace Infokom.Gaming.Poker.Texas
 					locals[worker] = local;
 				});
 
-				var wins = new long[playerCount];
+				var soleWins = new long[playerCount];
+				var sharedWins = new long[playerCount];
+				var topFinishes = new long[playerCount];
+				var equityShares = new double[playerCount];
 				long games = 0;
 
 				for (int i = 0; i < locals.Length; i++)
@@ -276,10 +318,15 @@ namespace Infokom.Gaming.Poker.Texas
 					games += local.Games;
 
 					for (int p = 0; p < playerCount; p++)
-						wins[p] += local.Wins[p];
+					{
+						soleWins[p] += local.SoleWins[p];
+						sharedWins[p] += local.SharedWins[p];
+						topFinishes[p] += local.TopFinishes[p];
+						equityShares[p] += local.EquityShares[p];
+					}
 				}
 
-				return new Estimation(request.Id, wins, games);
+				return new Estimation(request.Id, soleWins, sharedWins, topFinishes, equityShares, games);
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -290,14 +337,7 @@ namespace Infokom.Gaming.Poker.Texas
 					if (!TryPlayOne(allHands, local.Pockets, local.Candidates, ref local.Rng, out ulong winnersMask))
 						continue;
 
-					local.Games++;
-
-					while (winnersMask != 0)
-					{
-						int w = BitOperations.TrailingZeroCount(winnersMask);
-						local.Wins[w]++;
-						winnersMask &= winnersMask - 1;
-					}
+					AccumulateOutcome(winnersMask, local.SoleWins, local.SharedWins, local.TopFinishes, local.EquityShares, ref local.Games);
 				}
 			}
 
@@ -306,16 +346,39 @@ namespace Infokom.Gaming.Poker.Texas
 				public MonteCarloLocal(int playerCount, int maxHands, ulong seed)
 				{
 					Rng = new XorShift64Star(seed);
-					Wins = new long[playerCount];
+					SoleWins = new long[playerCount];
+					SharedWins = new long[playerCount];
+					TopFinishes = new long[playerCount];
+					EquityShares = new double[playerCount];
 					Pockets = new CardSet[playerCount];
 					Candidates = new CardSet[maxHands];
 				}
 
 				public XorShift64Star Rng;
-				public long[] Wins { get; }
+				public long[] SoleWins { get; }
+				public long[] SharedWins { get; }
+				public long[] TopFinishes { get; }
+				public double[] EquityShares { get; }
 				public long Games;
 				public CardSet[] Pockets { get; }
 				public CardSet[] Candidates { get; }
+			}
+
+			private sealed class LocalAccumulator
+			{
+				public LocalAccumulator(int playerCount)
+				{
+					SoleWins = new long[playerCount];
+					SharedWins = new long[playerCount];
+					TopFinishes = new long[playerCount];
+					EquityShares = new double[playerCount];
+				}
+
+				public long[] SoleWins { get; }
+				public long[] SharedWins { get; }
+				public long[] TopFinishes { get; }
+				public double[] EquityShares { get; }
+				public long Games;
 			}
 
 			private struct XorShift64Star
@@ -371,6 +434,38 @@ namespace Infokom.Gaming.Poker.Texas
 					return (int)(product >> 32);
 				}
 			}
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private static void AccumulateOutcome(
+	ulong winnersMask,
+	long[] soleWins,
+	long[] sharedWins,
+	long[] topFinishes,
+	double[] equityShares,
+	ref long games)
+{
+	games++;
+
+	int winnerCount = BitOperations.PopCount(winnersMask);
+	double share = 1d / winnerCount;
+	bool shared = winnerCount > 1;
+
+	while (winnersMask != 0)
+	{
+		int player = BitOperations.TrailingZeroCount(winnersMask);
+
+		topFinishes[player]++;
+
+		if (shared)
+			sharedWins[player]++;
+		else
+			soleWins[player]++;
+
+		equityShares[player] += share;
+
+		winnersMask &= winnersMask - 1;
+	}
+}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			private static bool TryPlayOne(CardSet[][] allHands, CardSet[] pockets, CardSet[] candidates, ref XorShift64Star rng, out ulong winnersMask)

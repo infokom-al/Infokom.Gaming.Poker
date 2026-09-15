@@ -34,23 +34,24 @@ namespace Infokom.Gaming.Poker.Texas.Benchmarks
 				for (int c = 0; c < 13; c++)
 				{
 					var hero = GTO.Range.Parse(CellLabels[r, c]);
-					var vill = GTO.Range.Ω & ~hero;
+					var vill = GTO.Range.Ω;
 
 					var request = Equity.Estimation.Request.Create(hero, vill);
-					var result = Equity.Estimation.Estimate(request);
+					var result = Equity.Estimation.EstimateMonteCarlo(request, 10000);
 
-					var winsum = result.Wins.Sum();
-					var weight = result.Wins[0] / (float)winsum;
+					var weight = (float)result.WinRateOf(0);
 
 					heatmap[r, c] = new HeatmapCell(CellLabels[r, c], weight);
 
-					AnsiConsole.WriteLine($"{CellLabels[r, c]} vs Any: {weight:F4}");
+					//AnsiConsole.WriteLine($"{hero} vs {vill}: {weight:F4}");
+					AnsiConsole.Write($"{weight:F4} ");
 				}
+				AnsiConsole.WriteLine();
 			}
 
 			if (AnsiConsole.Confirm("Do you want to print the heatmap?", true))
 			{
-				AnsiConsole.Clear();
+				//AnsiConsole.Clear();
 				PrintHeatmap(heatmap);
 			}
 		}
@@ -87,11 +88,11 @@ namespace Infokom.Gaming.Poker.Texas.Benchmarks
 				string background = $"{r:X2}{g:X2}{b:X2}";
 				string foreground = UseDarkForeground(r, g, b) ? "000000" : "FFFFFF";
 
-				return $"[#{foreground} on #{background}] {Markup.Escape(cell.Label)} [/]";
+				return $"[#{foreground} on #{background}] {Markup.Escape(cell.Weight.ToString("F4"))} [/]";
 			}
 			else
 			{
-				return cell.Label;
+				return cell.Weight.ToString("F4");
 			}
 		}
 
