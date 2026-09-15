@@ -59,20 +59,6 @@ The tool will then ask for:
 
 - player count
 - one range per player
-- simulation count
-- optional seed
-- parallel on/off
-
-### Options
-
-- `--sim <n>`  
-  Number of Monte Carlo simulations.
-
-- `--seed <n>`  
-  Fixed random seed for reproducible runs.
-
-- `--no-parallel`  
-  Disables parallel Monte Carlo execution.
 
 ## Benchmarks
 
