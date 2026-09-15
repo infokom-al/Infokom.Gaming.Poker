@@ -647,5 +647,10 @@ namespace Infokom.Gaming.Poker.Texas
 			/// <returns></returns>
 			public static Range operator ~(Range range) => new Range(~range._data) & Range.Ω;
 		}
+
+
+
+
+
 	}
 }
