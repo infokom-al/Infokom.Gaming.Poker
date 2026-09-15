@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Infokom.Gaming.Poker.Texas.Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "\"AKs QQ\" \"TT+ AQo+\" \"22+,A2s+,K9s+\" --sim 3000000"
+    }
+  }
+}
