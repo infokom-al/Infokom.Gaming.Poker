@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
 namespace Infokom.Gaming.Poker
 {
+	//9824	♠	&spades;	&#9824;	Spade
+	//9827	♣	&clubs;	&#9827;	Club
+	//9829	♥	&hearts;	&#9829;	Heart
+	//9830	♦	&diams;	&#9830;	Diamond
+
 	// $S = \{s,d,c,h\}$
-	public enum Suit : byte { Spade = 0b0001, Diamond = 0b0010, Club = 0b0100, Heart = 0b1000 }
+	public enum Suit : sbyte { Spade = 1, Diamond = 2, Club = 3, Heart = 4 }
 
 	public static class SuitExtensions
 	{
@@ -15,7 +15,7 @@ namespace Infokom.Gaming.Poker
 			public static bool TryCast(in char source, out Suit target)
 			{
 				switch (source)
-				{	
+				{
 					case 's': target = Suit.Spade; return true;
 					case 'd': target = Suit.Diamond; return true;
 					case 'c': target = Suit.Club; return true;

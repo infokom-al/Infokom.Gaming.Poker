@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Extensions;
+using Infokom.Numerics.Extensions;
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -59,15 +59,15 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 
 
 			[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryExtract(Ranks source, out Ranks target)
+			public static bool TryExtract(RankSet source, out RankSet target)
 			{
 				target = default;
 				
-				return TryExtract((ushort)source, out Unsafe.As<Ranks, ushort>(ref target));
+				return TryExtract((ushort)source, out Unsafe.As<RankSet, ushort>(ref target));
 			}
 
 			[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks source, out Rank r1, out Rank r2, out Rank r3, out Rank r4, out Rank r5)
+			public static bool TryDetect(RankSet source, out Rank r1, out Rank r2, out Rank r3, out Rank r4, out Rank r5)
 			{
 				if(source.Count >= 5)
 				{	

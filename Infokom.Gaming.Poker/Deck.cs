@@ -27,7 +27,7 @@ namespace Infokom.Gaming.Poker
 
 
 
-		[FieldOffset(0)] public readonly Cards State;
+		[FieldOffset(0)] public readonly CardSet State;
 
 
 		private Deck(ulong binary) : this() => _binary = binary;

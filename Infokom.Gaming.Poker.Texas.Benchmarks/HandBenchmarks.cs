@@ -1,7 +1,7 @@
-﻿#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable CA1822 // Mark members as static
 using BenchmarkDotNet.Attributes;
 
-using static Infokom.Gaming.Poker.Cards;
+using static Infokom.Gaming.Poker.CardSet;
 
 namespace Infokom.Gaming.Poker.Texas.Benchmarks
 {
@@ -11,19 +11,14 @@ namespace Infokom.Gaming.Poker.Texas.Benchmarks
 	[DisassemblyDiagnoser]
 	public class HandBenchmarks
 	{
-		private const Cards HIGH = SA | DK | C9 | H7 | S4 | C3 | H2;
-		private const Cards STRA = SA | DK | CQ | HJ | ST | C7 | H2;
-		private const Cards FLUS = SA | SK | S9 | S7 | S4 | DK | C2;
-		private const Cards QUAD = SA | DA | CA | HA | SK | C7 | H2;
-		private const Cards STRF = SA | SK | SQ | SJ | ST | D2 | C3;
+		private static readonly CardSet HIGH = SA | (D_ | _K) | C_ | _9 | H_ | _7 | S_ | _4 | C_ | _3 | H_ | _2;
+		private static readonly CardSet STRA = SA | D_ | _K | C_ | _Q | H_ | _J | S_ | _T | C_ | _7 | H2;
+		private static readonly CardSet FLUS = SA | S_ | _K | S_ | _9 | S_ | _7 | S_ | _4 | D_ | _K | C2;
+		private static readonly CardSet QUAD = SA | DA | CA | H_ | _A | S_ | _K | C_ | _7 | H2;
+		private static readonly CardSet STRF = SA | S_ | _K | S_ | _Q | S_ | _J | S_ | _T | D2 | C_ | _3;
 
 		[Benchmark]
-		[Arguments(HIGH)]
-		[Arguments(STRA)]
-		[Arguments(FLUS)]
-		[Arguments(QUAD)]
-		[Arguments(STRF)]
-		public Hand.Ranking EvaluateBenchmark(Cards cards) => Hand.Evaluate(cards);
+		public Hand.Ranking EvaluateHIGHBenchmark() => Hand.Evaluate(HIGH);
 	}
 }
 #pragma warning restore CA1822 // Mark members as static

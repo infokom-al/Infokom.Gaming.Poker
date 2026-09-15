@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -62,7 +62,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			public const ulong KERNEL = 0b1000000000000000100000000000000010000000000000001;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks s, Ranks d, Ranks c, Ranks h, out Rank x, out Rank y)
+			public static bool TryDetect(RankSet s, RankSet d, RankSet c, RankSet h, out Rank x, out Rank y)
 			{
 				x = (Rank)(sbyte)BitOperations.Log2(((ushort)(s & d & h & c)               ));
 				y = (Rank)(sbyte)BitOperations.Log2(((ushort)(s | d | h | c) & (~(1u << x))));

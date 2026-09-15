@@ -1,4 +1,4 @@
-﻿#pragma warning disable CA1822 // Mark members as static
+#pragma warning disable CA1822 // Mark members as static
 using BenchmarkDotNet.Attributes;
 
 namespace Infokom.Gaming.Poker.Texas.Benchmarks
@@ -10,16 +10,16 @@ namespace Infokom.Gaming.Poker.Texas.Benchmarks
 	[IterationCount(500)]
 	public class TableBenchmarks
 	{
-		private Table[] _tables;
+		private TexasTable[] _tables;
 		private Hand.Ranking[] _handRankBuffer;
 
 		[IterationSetup]
 		public void Setup()
 		{
-			_tables = new Table[9];
+			_tables = new TexasTable[9];
 			for (int n = 2; n <= 10; n++)
 				_tables[n - 2] = CreateRandomTable(n);
-			_handRankBuffer = new Hand.Ranking[Table.MaxSeats];
+			_handRankBuffer = new Hand.Ranking[TexasTable.MaxSeats];
 		}
 
 		[Benchmark]
@@ -37,9 +37,9 @@ namespace Infokom.Gaming.Poker.Texas.Benchmarks
 			return _tables[seatCount - 2].Evaluate();
 		}
 
-		private static Table CreateRandomTable(int players)
+		private static TexasTable CreateRandomTable(int players)
 		{
-			var table = new Table();
+			var table = new TexasTable();
 
 			for (int seat = 0; seat < players; seat++)
 				table.OccupySeat(seat);

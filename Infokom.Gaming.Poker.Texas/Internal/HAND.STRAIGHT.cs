@@ -1,13 +1,5 @@
-﻿using Infokom.Numerics.Atomics;
-
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
-
-using static Infokom.Gaming.Poker.CardExtensions;
 
 namespace Infokom.Gaming.Poker.Texas.Internal
 {
@@ -69,7 +61,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks source, out Rank result)
+			public static bool TryDetect(RankSet source, out Rank result)
 			{
 				result = (Rank)Detect((ushort)source, out _);
 

@@ -1,11 +1,33 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 
 namespace Infokom.Numerics.Atomics
 {
-	public interface IPoint<TPoint> where TPoint : IPoint<TPoint>
+	
+
+
+	public interface IPoint<Tx, Ty> where Tx : unmanaged where Ty : unmanaged
+	{
+		public Tx X { get; }
+
+		public Ty Y { get; }
+	}
+
+	public interface IPunctiform<TPoint> where TPoint : IPunctiform<TPoint>
 	{
 		public static abstract TPoint Midpoint(TPoint a, TPoint b);
+	}
+
+	public interface IPunctiform<TPoint, Tx, Ty> where TPoint : IPunctiform<TPoint, Tx, Ty> where Tx : unmanaged where Ty : unmanaged
+	{
+		public Tx X { get; }
+		public Ty Y { get; }
+
+
+
+		public static abstract implicit operator TPoint(Point<Tx, Ty> source);
+		public static abstract implicit operator Point<Tx, Ty>(TPoint source);
 	}
 
 
@@ -13,24 +35,16 @@ namespace Infokom.Numerics.Atomics
 
 
 	#region p = ⟨x⟩
-
-	public readonly record struct Point<Tx>(Tx X) : IPoint<Point<Tx>> where Tx : unmanaged, INumber<Tx>
+	[StructLayout(LayoutKind.Sequential)]
+	public readonly record struct Point<Tx>(Tx X) where Tx : unmanaged, INumber<Tx>
 	{
-		private static readonly Tx X_0 = Tx.Zero;
-		private static readonly Tx X_1 = Tx.One;
-		private static readonly Tx X_2 = X_1 + X_1;
 
-		/// <summary><c>(x: <see cref="INumberBase{Tx}.Zero">0</see>)</c></summary>
-		public static readonly Point<Tx> Zero = new(X_0);
-
-		/// <summary><c>(x: <see cref="INumberBase{Tx}.One">1</see>)</c></summary>
-		public static readonly Point<Tx> Unit = new(X_1);
-
-		public static Point<Tx> Midpoint(Point<Tx> a, Point<Tx> b) => new((a.X - b.X) / X_2);
-
+		public static readonly Point<Tx> Zero = new(Tx.Zero);
+		public static readonly Point<Tx> Unit = new(Tx.One);
 
 
 		public static implicit operator Point<Tx>(Tx source) => new(source);
+		public static implicit operator Tx(Point<Tx> source) => source.X;
 	}
 
 	public static class Point1
@@ -44,8 +58,12 @@ namespace Infokom.Numerics.Atomics
 	#endregion
 
 	#region p = ⟨x, y⟩
+	[StructLayout(LayoutKind.Sequential)]
 	public readonly record struct Point<Tx, Ty>(Tx X, Ty Y) where Tx : unmanaged where Ty : unmanaged
 	{
+
+
+		public static implicit operator Point<Tx, Ty>((Tx X, Ty Y) source) => new(source.X, source.Y);
 	}
 
 	public static class Point2
@@ -71,9 +89,10 @@ namespace Infokom.Numerics.Atomics
 	/// <param name="X"></param>
 	/// <param name="Y"></param>
 	/// <param name="Z"></param>
+	[StructLayout(LayoutKind.Sequential)]
 	public readonly record struct Point<Tx, Ty, Tz>(Tx X, Ty Y, Tz Z) where Tx : unmanaged, INumber<Tx> where Ty : unmanaged, INumber<Ty> where Tz : unmanaged, INumber<Tz>
 	{
-
+		public static implicit operator Point<Tx, Ty, Tz>(ValueTuple<Tx, Ty, Tz> source) => new(source.Item1, source.Item2, source.Item3);
 	}
 
 	public static class Point3
@@ -94,19 +113,9 @@ namespace Infokom.Numerics.Atomics
 	//tex:
 	//$p = (x, y, z, w) \in \mathit{R}^4$
 	[StructLayout(LayoutKind.Sequential)]
-	public readonly struct Point<Tx, Ty, Tz, Tw> where Tx : unmanaged where Ty : unmanaged where Tz : unmanaged where Tw : unmanaged
+	public readonly record struct Point<Tx, Ty, Tz, Tw>(Tx X, Ty Y, Tz Z, Tw W) where Tx : unmanaged where Ty : unmanaged where Tz : unmanaged where Tw : unmanaged
 	{
-		private readonly Tx _x;
-		private readonly Ty _y;
-		private readonly Tz _z;
-		private readonly Tw _w;
-
-		public Point(Tx x, Ty y, Tz z, Tw w) => (_x, _y, _z, _w) = (x, y, z, w);
-
-		public Tx X => _x;
-		public Ty Y => _y;
-		public Tz Z => _z;
-		public Tw W => _w;
+		public static implicit operator Point<Tx, Ty, Tz, Tw>(ValueTuple<Tx, Ty, Tz, Tw> source) => new(source.Item1, source.Item2, source.Item3, source.Item4);
 	}
 
 	public static class Point4
@@ -122,23 +131,41 @@ namespace Infokom.Numerics.Atomics
 			public static Point<T, T, T, T> UnitW => new(T.Zero, T.Zero, T.Zero, T.One);
 		}
 	}
-	#endregion
-
-
+	#endregion	
 
 	public static class Point
 	{
-		
+
+		public static Point<T> X<T>(T x) where T : unmanaged, INumber<T> => new(x);
+
+		public static Point<T, T> Y<T>(this Point<T> source, T y) where T : unmanaged, INumber<T> => new(source.X, y);
+
+		public static Point<T, T, T> Z<T>(this Point<T, T> source, T z) where T : unmanaged, INumber<T> => new(source.X, source.Y, z);
+
+		public static Point<T, T, T, T> W<T>(this Point<T, T, T> source, T w) where T : unmanaged, INumber<T> => new(source.X, source.Y, source.Z, w);
 
 
+		public static Point<sbyte, sbyte> ToSByte(this Point<int, int> source)
+		{
+			var (x, y) = source;
 
-		#region Point<X,Y,Z,W>
-		public static Point<T, T, T, T> ToPoint<T>(this ValueTuple<T, T, T, T> source) where T : unmanaged, INumber<T> => new(source.Item1, source.Item2, source.Item3, source.Item4);
+			return new(checked((sbyte)x), checked((sbyte)y));
+		}
 
-		public static void Deconstruct<T>(this Point<T, T, T, T> source, out T x, out T y, out T z, out T w) where T : unmanaged, INumber<T> => (x, y, z, w) = (source.X, source.Y, source.Z, source.W);
-		#endregion
+		public static Point<short, short> ToInt16(this Point<int, int> source)
+		{
+			var (x, y) = source;
+
+			return new(checked((short)x), checked((short)y));
+		}
+
+		public static Point<long, long> ToInt64(this Point<int, int> source)
+		{
+			var (x, y) = source;
+
+			return new(x, y);
+		}
+
+
 	}
-
-	
-	
 }

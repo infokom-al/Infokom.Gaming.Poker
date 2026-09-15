@@ -9,12 +9,12 @@ namespace Infokom.Gaming.Poker.Texas
 	/// Cards are dealt to occupied seats in round-robin order until every seat has
 	/// two pocket cards; subsequent cards are dealt to the shared board.
 	/// </summary>
-	public sealed class Table : IObserver<Card>
+	public sealed class TexasTable : IObserver<Card>
 	{
 		public const int MaxSeats = 10;
-		private readonly Cards[] _pockets = new Cards[MaxSeats];
+		private readonly CardSet[] _pockets = new CardSet[MaxSeats];
 		private Bit.Vector<ushort> _occupied;
-		private Cards _board;
+		private CardSet _board;
 		private bool _completed;
 		private int _nextSeat;
 		private Exception _error;
@@ -46,7 +46,7 @@ namespace Infokom.Gaming.Poker.Texas
 				return;
 
 			_occupied[seat] = false;
-			_pockets[seat] = Cards.Φ;
+			_pockets[seat] = CardSet.Φ;
 			OccupiedSeatCount--;
 		}
 
@@ -109,7 +109,7 @@ namespace Infokom.Gaming.Poker.Texas
 			if (_board.Count < 3)
 				throw new InvalidOperationException("At least three board cards are required for evaluation.");
 			
-			Hand.Ranking[] results = new Hand.Ranking[Table.MaxSeats];
+			Hand.Ranking[] results = new Hand.Ranking[TexasTable.MaxSeats];
 			
 			for (int seat = 0; seat < MaxSeats; seat++)
 			{
@@ -178,7 +178,7 @@ namespace Infokom.Gaming.Poker.Texas
 
 		private void EnsureNotDealing()
 		{
-			if (_board.Count != 0 || _pockets.Any(static pocket => pocket != Cards.Φ))
+			if (_board.Count != 0 || _pockets.Any(static pocket => pocket != CardSet.Φ))
 				throw new InvalidOperationException("Seats cannot change after dealing has started.");
 		}
 

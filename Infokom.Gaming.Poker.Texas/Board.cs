@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -9,34 +9,17 @@ namespace Infokom.Gaming.Poker.Texas
 	[StructLayout(LayoutKind.Sequential)]
 	public readonly struct Board
 	{
-		private readonly Cards _data;
+		public readonly CardSet Cards;
 
-		private Board(Cards data) => _data = data;
-
-		public Cards Cards
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => _data;
-		}
+		private Board(CardSet data) => Cards = data;
 
 
 
-
-		public override string ToString()
-		{
-			var buffer = new string[_data.Count];
-
-			int i = 0;
-			foreach (var card in _data)
-			{
-				buffer[i++] = card.Symbol;
-			}
-			return "[" + string.Join(", ", buffer) + "]";
-		}
+		public override string ToString() => this.Cards.ToString();
 
 		public static readonly Board Empty;
 
-		internal static Board Create(Cards cards) => new(cards);
+		internal static Board Create(CardSet cards) => new(cards);
 
 
 
@@ -50,7 +33,7 @@ namespace Infokom.Gaming.Poker.Texas
 		{
 			private Card _0;
 
-			public readonly Board GetBoard() => new(Cards.Select(_0));
+			public readonly Board GetBoard() => new(CardSet.Select(_0));
 		}
 
 		public static Board.PreFlopStreet PreFlop => default;
@@ -60,7 +43,7 @@ namespace Infokom.Gaming.Poker.Texas
 		{
 			private Card _0;
 
-			public readonly Board GetBoard() => new(Cards.Select(this[0], this[1], this[2], this[3]));
+			public readonly Board GetBoard() => new(CardSet.Select(this[0], this[1], this[2], this[3]));
 
 
 			public readonly RiverStreet Next(Card river) 
@@ -82,7 +65,7 @@ namespace Infokom.Gaming.Poker.Texas
 		{
 			private Card _0;
 
-			public readonly Board GetBoard() => new(Cards.Select(this[0], this[1], this[2]));
+			public readonly Board GetBoard() => new(CardSet.Select(this[0], this[1], this[2]));
 
 
 			public readonly TurnStreet Next(Card turn)
@@ -129,7 +112,7 @@ namespace Infokom.Gaming.Poker.Texas
 			if (!match.Success)
 				throw new FormatException();
 
-			Cards cards = 0;
+			CardSet cards = CardSet.Φ;
 
 			var cardGroup = match.Groups["card"];
 			for (int i = 0; i < cardGroup.Captures.Count; i++)

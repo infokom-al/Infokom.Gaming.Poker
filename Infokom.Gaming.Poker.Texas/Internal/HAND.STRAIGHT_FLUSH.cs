@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
@@ -21,7 +21,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks s, Ranks d, Ranks c, Ranks h, out Suit suit, out Rank rank)
+			public static bool TryDetect(RankSet s, RankSet d, RankSet c, RankSet h, out Suit suit, out Rank rank)
 			{
 				(suit, rank) = (default, default);
 

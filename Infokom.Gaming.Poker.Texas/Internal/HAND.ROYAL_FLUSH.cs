@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 
 using CardSet = ulong;
@@ -23,7 +23,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			public const float ODDS_AGAINST = 1/p - 1;
 
 
-			private const Ranks TARGET = (Ranks)0x7C00;
+			private const ushort TARGET = 0x7C00;
 
 
 
@@ -35,9 +35,9 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			/// <param name="target">rank set bit mask of the isolated straight</param>
 			/// <returns>True if ant straight flush was found, false otherwise</returns>
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks s, Ranks d, Ranks c, Ranks h)
+			public static bool TryDetect(RankSet s, RankSet d, RankSet c, RankSet h)
 			{
-				return s is TARGET || d is TARGET || c is TARGET || h is TARGET;
+				return (ushort)s is TARGET || (ushort)d is TARGET || (ushort)c is TARGET || (ushort)h is TARGET;
 			}
 		}
 	}

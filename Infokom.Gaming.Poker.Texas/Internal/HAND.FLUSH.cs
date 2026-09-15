@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Infokom.Gaming.Poker.Texas.Internal
@@ -32,11 +32,11 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 		
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static bool TryDetect(Ranks s, Ranks d, Ranks c, Ranks h, out Rank ρ1, out Rank ρ2, out Rank ρ3, out Rank ρ4, out Rank ρ5)
+			public static bool TryDetect(RankSet s, RankSet d, RankSet c, RankSet h, out Rank ρ1, out Rank ρ2, out Rank ρ3, out Rank ρ4, out Rank ρ5)
 			{
 				var R = s.Count >= 5 ? s : d.Count >= 5 ? d : c.Count >= 5 ? c : h.Count >= 5 ? h : default;
 				
-				if(R is not 0)
+				if(!R.IsEmpty)
 				{				
 					ρ1 = (R					).Upmost();
 					ρ2 = (R = R.Exclude(ρ1)	).Upmost();

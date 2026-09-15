@@ -644,7 +644,47 @@ namespace Infokom.Numerics.Atomics
 		/// <summary>
 		/// Delete char
 		/// </summary>
-		DEL = 127
+		DEL = 127,
+
+
+
+
+
+
+		/// <summary>
+		/// ░
+		/// </summary>
+		LowDensityDotted = 176,
+
+		/// <summary>
+		/// ▒
+		/// </summary>
+		MediumDensityDotted = 177,
+
+		/// <summary>
+		/// ▓
+		/// </summary>
+		HighDensityDotted = 178,
+
+		/// <summary>
+		/// █
+		/// </summary>
+		Block = 219,
+
+		/// <summary>
+		/// ▄
+		/// </summary>
+		LowBlock = 220,
+
+		/// <summary>
+		/// ▀
+		/// </summary>
+		UppBlock = 223,
+
+		/// <summary>
+		/// ■
+		/// </summary>
+		MidBlock = 254,
 	}
 
 	public static class ASCIIExtensions

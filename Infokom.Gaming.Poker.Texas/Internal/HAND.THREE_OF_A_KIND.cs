@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Infokom.Gaming.Poker.Texas.Internal
 {
@@ -62,7 +62,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 
 
 			[method: MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-			public static bool TryExtract(Ranks s, Ranks d, Ranks c, Ranks h, out Ranks target)
+			public static bool TryExtract(RankSet s, RankSet d, RankSet c, RankSet h, out RankSet target)
 			{
 				target =	(s & d & c    ) | 
 						(s & d     & h) | 
@@ -74,7 +74,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			}
 
 			[method: MethodImpl(methodImplOptions: MethodImplOptions.AggressiveInlining)]
-			public static bool TryExtract(Cards source, out Ranks target)
+			public static bool TryExtract(CardSet source, out RankSet target)
 			{
 				var (s, d, c, h) = source;
 
@@ -82,7 +82,7 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			internal static bool TryDetect(Ranks S, Ranks D, Ranks C, Ranks H, out Rank α, out Rank β, out Rank γ)
+			internal static bool TryDetect(RankSet S, RankSet D, RankSet C, RankSet H, out Rank α, out Rank β, out Rank γ)
 			{
 				var R =
 				(
@@ -92,18 +92,18 @@ namespace Infokom.Gaming.Poker.Texas.Internal
 					(    D & C & H)
 				);
 
-				if (R is not 0)									//if there are at least the coranking cards
+				if (!R.IsEmpty)									//if there are at least the coranking cards
 				{	
 					α = R.Upmost();
 
 					R = (S | D | C | H).Exclude(α);
 
-					if (R is not 0)								//and if there are enouph cards to pick another as first kciker
+					if (!R.IsEmpty)								//and if there are enouph cards to pick another as first kciker
 					{
 						β = R.Upmost();
 
 						R = R.Exclude(β);
-						if (R is not 0)							//and if there are enouph cards to pick another as second kciker
+						if (!R.IsEmpty)							//and if there are enouph cards to pick another as second kciker
 						{
 							γ = R.Upmost();			
 									

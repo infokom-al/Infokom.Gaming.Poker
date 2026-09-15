@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Collections;
 using System.Numerics;
@@ -55,17 +55,17 @@ namespace Infokom.Numerics.Extensions
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static int BitScanShuffle(this ulong source)
+		public static sbyte BitScanShuffle(this ulong source)
 		{
-			int offset = -1;
+			sbyte offset = -1;
 
 			if (source != default)
 			{
 				var n = (int)uint.Random(0u, (uint)(BitOperations.PopCount(source) - 1));//skip count
 				if (Bmi2.X64.IsSupported)
-					offset = BitOperations.TrailingZeroCount(Bmi2.X64.ParallelBitDeposit(1ul << n, source));
+					offset = (sbyte)BitOperations.TrailingZeroCount(Bmi2.X64.ParallelBitDeposit(1ul << n, source));
 				else
-					for (int i = 0; i <= n; i++) offset = BitOperations.TrailingZeroCount(source &= (source - 1));
+					for (int i = 0; i <= n; i++) offset = (sbyte)BitOperations.TrailingZeroCount(source &= (source - 1));
 			}
 
 			return offset;
@@ -86,6 +86,24 @@ namespace Infokom.Numerics.Extensions
 			return true;
 		}
 
+
+
+
+		public static bool BitScanRandom(this byte source, out sbyte offset, out byte target)
+		{
+			if (source == default)
+			{
+				offset = -1;
+				target = default;
+				return false;
+			}
+
+			target = (byte)(source & ~(1u << (offset = (sbyte)source.BitScanRandom())));
+			return true;
+		}
+
+
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool BitScanRandom(this uint source, out int offset, out uint target)
 		{
@@ -101,7 +119,7 @@ namespace Infokom.Numerics.Extensions
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool BitScanRandom(this ulong source, out int offset, out ulong target)
+		public static bool BitScanRandom(this ulong source, out sbyte offset, out ulong target)
 		{
 			if (source == default)
 			{
@@ -118,6 +136,39 @@ namespace Infokom.Numerics.Extensions
 		#endregion
 
 		#region BIT SCAN FORWARD
+		/// <summary>
+		/// Find the the least significant non zero bit
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <returns>Index of the least significant non zero bit</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static sbyte BitScanForward(this byte source) => (sbyte)BitOperations.TrailingZeroCount(source);
+
+
+		/// <summary>
+		/// Find the least significant non zero bit.
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <param name="offset">Index of the least significant non zero bit</param>
+		/// <param name="target">Binary value with the least significant non zero bit cleared</param>
+		/// <returns>True if a non zero bit is found; otherwise, false</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool BitScanForward(this byte source, out sbyte offset, out byte target)
+		{
+
+			if (source == default)
+			{
+				offset = -1;
+				target = default;
+				return false;
+			}
+
+			target = (byte)(source & ~(1u << (offset = source.BitScanForward())));
+			return true;
+		}
+
+
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BitScanForward(this ushort source) => BitOperations.TrailingZeroCount(source);
 
@@ -126,6 +177,14 @@ namespace Infokom.Numerics.Extensions
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BitScanForward(this ulong source) => BitOperations.TrailingZeroCount(source);
+
+
+
+		
+
+
+
+
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool BitScanForward(this ushort source, out int offset, out ushort target)
@@ -176,7 +235,41 @@ namespace Infokom.Numerics.Extensions
 		#endregion
 
 		#region BIT SCAN REVERSE
-		public static int BitScanReverse(this byte source) => BitOperations.Log2(source);
+		/// <summary>
+		/// Find the the least significant non zero bit
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <returns>Index of the least significant non zero bit</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static sbyte BitScanReverse(this byte source) => (sbyte)BitOperations.Log2(source);
+
+
+		/// <summary>
+		/// Find the least significant non zero bit.
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <param name="offset">Index of the least significant non zero bit</param>
+		/// <param name="target">Binary value with the least significant non zero bit cleared</param>
+		/// <returns>True if a non zero bit is found; otherwise, false</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool BitScanReverse(this byte source, out sbyte offset, out byte target)
+		{
+
+			if (source == default)
+			{
+				offset = -1;
+				target = default;
+				return false;
+			}
+
+			target = (byte)(source & ~(1u << (offset = source.BitScanReverse())));
+			return true;
+		}
+
+
+
+
+
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int BitScanReverse(this ushort source) => BitOperations.Log2(source);

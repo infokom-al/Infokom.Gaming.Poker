@@ -1,4 +1,4 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -10,11 +10,11 @@ namespace Infokom.Gaming.Poker.Texas
 	[StructLayout(LayoutKind.Sequential)]
 	public readonly struct Pocket
 	{
-		private readonly Cards _data;
+		private readonly CardSet _data;
 
-		private Pocket(Cards cards) => _data = cards;
+		private Pocket(CardSet cards) => _data = cards;
 
-		public Cards Cards
+		public CardSet Cards
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => _data;
@@ -27,10 +27,10 @@ namespace Infokom.Gaming.Poker.Texas
 			//var lo = CardSet.Select(_data.Ranks.Lowest());
 
 
-			x = _data.Top();
-			y = _data.Exclude(x).Top();
+			x = _data.Order().ByRank().Descending().First();
+			y = _data.Order().ByRank().First();
 
-			(x, y) = (Card.Hi(x, y), Card.Lo(x, y));
+			//(x, y) = (Card.Hi(x, y), Card.Lo(x, y));
 		}
 
 		public override string ToString() 
@@ -44,13 +44,13 @@ namespace Infokom.Gaming.Poker.Texas
 
 		public static readonly Pocket Empty;
 
-		internal static Pocket Create(Cards cards) => new(cards);
+		internal static Pocket Create(CardSet cards) => new(cards);
 
 
 
-		public static implicit operator Pocket((Card X, Card Y) source) => new(Cards.Select(source.X, source.Y));
+		public static implicit operator Pocket((Card X, Card Y) source) => new(CardSet.Select(source.X, source.Y));
 
-		public static implicit operator Cards(Pocket source) => source.Cards;
+		public static implicit operator CardSet(Pocket source) => source.Cards;
 		
 		private static readonly Regex REGEX = new(@"\[([2-9TJQKA][sdch]), ([2-9TJQKA][sdch])\]", RegexOptions.Compiled);
 

@@ -1,4 +1,4 @@
-﻿using Infokom.Gaming.Poker.Texas.Internal;
+using Infokom.Gaming.Poker.Texas.Internal;
 using Infokom.Numerics.Atomics;
 
 using System.Diagnostics.CodeAnalysis;
@@ -222,7 +222,7 @@ namespace Infokom.Gaming.Poker.Texas
 			}			
 		}
 
-		public static bool TryEvaluate(Cards source, out Hand.Ranking target)
+		public static bool TryEvaluate(CardSet source, out Hand.Ranking target)
 		{
 			if (source.Count is >= 5 and <= 7)
 			{
@@ -295,7 +295,7 @@ namespace Infokom.Gaming.Poker.Texas
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Hand.Ranking Evaluate(Cards source)
+		public static Hand.Ranking Evaluate(CardSet source)
 		{
 			if (source.Count is >= 5 and <= 7)
 			{

@@ -1,33 +1,36 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Collections;
 using System.Drawing;
 
 namespace Infokom.Numerics
 {
-	public interface IMap<Tx, T>
+	public interface IMap<TSource, TTarget>
 	{
-		public T this[Tx x] { get; }
+		public TTarget this[TSource source] { get; }
 	}
 
-	public interface IMap<Tx, Ty, T>
+	public interface IMatrix<TElement> : IMap<Point<int, int>, TElement>
 	{
-		public T this[Ty y, Tx x] { get; }
-	}
+		/// <summary>
+		/// Acces an element at the specified row and column indices in the matrix.
+		/// </summary>
+		/// <param name="i">The row index.</param>
+		/// <param name="j">The column index.</param>
+		/// <returns>The element at the specified row and column indices.</returns>
+		public TElement this[int i, int j] { get; }
 
-
-
-
-
-
-
-
-	public interface IMatrix<T>
-	{
-		public T this[int y, int x] { get; }
-		public T this[Point<int, int> p] { get; }
+		TElement IMap<Point<int, int>, TElement>.this[Point<int, int> source] => this[source.Y, source.X];
 
 		public Size<int, int> Size { get; }
+	}
+
+
+	public interface IMatrixial<TMatrix, TElement> : IMatrix<TElement> where TMatrix : IMatrixial<TMatrix, TElement>
+	{
+		Size<int, int> IMatrix<TElement>.Size => TMatrix.Size;
+
+		public static new abstract Size<int, int> Size { get; }
 	}
 
 	public class Matrix<T> : IMatrix<T>, IEnumerable<T>
@@ -81,29 +84,29 @@ namespace Infokom.Numerics
 
 
 
-		public static Matrix<T> Create(int ni, int nj) => (uint)ni > 0 && (uint)nj > 0 ? new Matrix<T>(new T[ni, nj]) : throw new ArgumentOutOfRangeException("(ni, nj)", (ni, nj), "Size must be composed by positive integer.");
+		public static Matrix<T> Create(int rows, int cols) => (uint)rows > 0 && (uint)cols > 0 ? new Matrix<T>(new T[rows, cols]) : throw new ArgumentOutOfRangeException("(ni, nj)", (rows, cols), "Size must be composed by positive integer.");
 
-		public static Matrix<T> Create(int ni, int nj, T value)
+		public static Matrix<T> Create(int rows, int cols, T value)
 		{
-			var v = Matrix<T>.Create(ni, nj);
+			var v = Matrix<T>.Create(rows, cols);
 
-			_ = Parallel.For(0, ni, i =>
+			_ = Parallel.For(0, rows, row =>
 			{
-				for (int j = 0; j < nj; j++)
-					v._data[i, j] = value;
+				for (int col = 0; col < cols; col++)
+					v._data[row, col] = value;
 			});
 
 			return v;
 		}
 
-		public static Matrix<T> Create(int ni, int nj, Func<int, int, T> source)
+		public static Matrix<T> Create(int rows, int cols, Func<int, int, T> source)
 		{
-			var v = Matrix<T>.Create(ni, nj);
+			var v = Matrix<T>.Create(rows, cols);
 
-			_ = Parallel.For(0, ni, i =>
+			_ = Parallel.For(0, cols, col =>
 			{
-				for (int j = 0; j < nj; j++)
-					v._data[i, j] = source(i, j);
+				for (int row = 0; row < rows; row++)
+					v._data[row, col] = source(row, col);
 			});
 
 			return v;
@@ -115,10 +118,31 @@ namespace Infokom.Numerics
 
 	public static class Matrix
 	{
-		public readonly record struct Size(int R, int C);
-		public readonly record struct Index(int R, int C);
+		extension(Point<int, int> source)
+		{
+			/// <summary>
+			/// Row index of a cell in a grid like structure.
+			/// </summary>
+			public int Row => source.Y;
 
+			/// <summary>
+			/// Column index of a cell in a grid like structure.
+			/// </summary>
+			public int Col => source.X;
+		}
 
+		extension(Size<int, int> source)
+		{
+			/// <summary>
+			/// Number of cells on each row in a grid like structure.
+			/// </summary>
+			public int Rows => source.Y;
+
+			/// <summary>
+			/// Number of cells on each column in a grid like structure.
+			/// </summary>
+			public int Cols => source.X;
+		}
 
 
 		extension<T>(T[,] source)

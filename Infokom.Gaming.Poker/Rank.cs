@@ -1,10 +1,7 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
-using System.Collections;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-
-using static Infokom.Gaming.Poker.CardExtensions;
 
 namespace Infokom.Gaming.Poker
 {
@@ -32,10 +29,6 @@ namespace Infokom.Gaming.Poker
 
 	public static class RankExtensions
 	{
-
-		private static void Foo()
-		{
-		}
 
 		private const Rank T = (Rank)(sbyte)0xA, J = (Rank)(sbyte)0xB, Q = (Rank)(sbyte)0xC, K = (Rank)(sbyte)0xD, A = (Rank)(sbyte)0xE;
 
@@ -157,15 +150,7 @@ namespace Infokom.Gaming.Poker
 
 			#region ARITHMETICS
 
-			/// <summary>
-			/// Lowest well known <see cref="Rank">rank</see>
-			/// </summary>
-			public static Rank MinValue => MIN;
-
-			/// <summary>
-			/// Upmost well known <see cref="Rank">rank</see>
-			/// </summary>
-			public static Rank MaxValue => MAX;
+			
 
 
 
@@ -186,11 +171,11 @@ namespace Infokom.Gaming.Poker
 			/// <summary>
 			/// </summary>
 			/// <param name="span"></param>
-			/// <returns>The lowest rank if <paramref name="span"/> is not empty, otherwise the smallest value greater then <see cref=Rank.MAX">maximum</see> the well known rank</returns>
+			/// <returns>The lowest rank if <paramref name="span"/> is not empty, otherwise the smallest value greater then <see cref=Rank.Ace">maximum</see> well known rank</returns>
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static Rank Min(params ReadOnlySpan<Rank> span)
 			{
-				var y = MAX + 1;
+				var y = Rank.Ace + 1;
 
 				foreach (var x in span)
 					if (x < y)
@@ -213,11 +198,11 @@ namespace Infokom.Gaming.Poker
 			/// <summary>
 			/// </summary>
 			/// <param name="span"></param>
-			/// <returns>The upmost rank found in the <paramref name="span">span</paramref> if it is not empty, otherwise the upmost value lower then <see cref=Rank.MAX">minimum</see> well known rank</returns>
+			/// <returns>The upmost rank found in the <paramref name="span">span</paramref> if it is not empty, otherwise the upmost value lower then <see cref=Rank.Two">minimum</see> well known rank</returns>
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public static Rank Max(params ReadOnlySpan<Rank> span)
 			{
-				var y = (Rank)sbyte.MinValue;
+				var y = Rank.Two - 1;
 
 				foreach (var x in span)
 					if (x > y)
@@ -294,10 +279,6 @@ namespace Infokom.Gaming.Poker
 			};
 		}
 
-
-
-
-
 		extension<T>(T) where T : unmanaged, IShiftOperators<T, int, T>
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -333,27 +314,13 @@ namespace Infokom.Gaming.Poker
 			}
 		}
 
-		extension<T>(ReadOnlySpan<T> source)
+
+		extension(Point)
 		{
-			public T this[Rank index]
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => source[(int)index];
-			}
+			public static Point<sbyte> X(Rank x) => Point.X((sbyte)x);
 		}
 
+		public static Point<sbyte, sbyte> Y(this Point<sbyte> source, Rank y) => source.Y((sbyte)y);
 
-		extension(BitMatrix16x16 source)
-		{
-
-			
-			public bool this[Rank row, Rank col]
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => source[(int)row, (int)col];
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				set => source[(int)row, (int)col] = value;
-			}
-		}
 	}
 }

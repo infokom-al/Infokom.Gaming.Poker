@@ -13,6 +13,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="Infokom.Gaming.Poker.Texas.Benchmarks"/>
+		<InternalsVisibleTo Include="Infokom.Gaming.Poker.Texas.Benchmarks" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Equity\GTO.Range.Rows.cs" />
 	</ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using Infokom.Gaming.Poker.Texas.Internal;
+using Infokom.Gaming.Poker.Texas.Internal;
 using Infokom.Numerics.Atomics;
 
 using System.Collections;
@@ -15,20 +15,20 @@ namespace Infokom.Gaming.Poker.Texas
 	{
 		[FieldOffset(0)] private readonly InlineArray4<ushort> _data;
 
-		[FieldOffset(0)] public readonly Cards Cards;
-		[FieldOffset(0)] public readonly Ranks S;
-		[FieldOffset(2)] public readonly Ranks D;
-		[FieldOffset(4)] public readonly Ranks C;
-		[FieldOffset(6)] public readonly Ranks H;
+		[FieldOffset(0)] public readonly CardSet Cards;
+		[FieldOffset(0)] public readonly RankSet S;
+		[FieldOffset(2)] public readonly RankSet D;
+		[FieldOffset(4)] public readonly RankSet C;
+		[FieldOffset(6)] public readonly RankSet H;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private Hand(InlineArray4<ushort> data) => _data = data;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Hand(Cards data) => Cards = data;
+		public Hand(CardSet data) => Cards = data;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Hand(Ranks s, Ranks d, Ranks h, Ranks c) => (S, D, H, C) = (s, d, h, c);
+		public Hand(RankSet s, RankSet d, RankSet h, RankSet c) => (S, D, H, C) = (s, d, h, c);
 
 
 		public int Count
@@ -38,19 +38,7 @@ namespace Infokom.Gaming.Poker.Texas
 		}
 
 
-		public override string ToString()
-		{
-
-			var buffer = new string[Cards.Count];
-
-			int i = 0;
-			foreach (var card in Cards.OrderByRankDescending())
-			{
-				buffer[i++] = card.Symbol;
-			}
-
-			return "[" + string.Join(", ", buffer) + "]";
-		}
+		public override string ToString() => this.Cards.ToString();
 
 
 
@@ -62,7 +50,7 @@ namespace Infokom.Gaming.Poker.Texas
 		{
 			//TO DO: check cardinality
 
-			return new(Cards.Select(cards));
+			return new(CardSet.Select(cards));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,7 +84,7 @@ namespace Infokom.Gaming.Poker.Texas
 
 				if (match.Success)
 				{
-					var cards = Cards.Φ;
+					var cards = CardSet.Φ;
 
 					foreach (var c in match.Groups["cards"].Value.Split(',', StringSplitOptions.TrimEntries))
 					{

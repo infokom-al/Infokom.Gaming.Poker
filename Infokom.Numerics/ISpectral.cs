@@ -1,10 +1,11 @@
-﻿using Infokom.Numerics.Atomics;
+using Infokom.Numerics.Atomics;
 
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Infokom.Numerics
 {
+
 	public interface INominable<TEntity, TNominal> : IEqualityOperators<TEntity, TEntity, bool> where TEntity : INominable<TEntity, TNominal>
 	{
 		public TNominal Group { get; }

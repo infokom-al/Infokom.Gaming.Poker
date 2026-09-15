@@ -5,27 +5,11 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/Apps/" />
-  <Folder Name="/Apps/CLI/" />
+  <Folder Name="/Apps/CLI/">
+    <Project Path="TexasRangeCalc/TexasRangeCalc.csproj" Id="5ff8bedb-fcdf-47c7-b50b-98036839e3a0" />
+  </Folder>
   <Folder Name="/Apps/GUI/" />
   <Folder Name="/Apps/WEB/" />
-  <Folder Name="/Hand2Note/">
-    <Project Path="BinarySerializer/BinarySerializer.csproj">
-      <Platform Solution="*|x86" Project="x86" />
-    </Project>
-    <Project Path="CSharpSerializer/CSharpSerializer.csproj">
-      <Platform Solution="*|x86" Project="x86" />
-    </Project>
-    <Project Path="Hand2NoteCore.HandStrength/Hand2NoteCore.HandStrength.csproj" />
-    <Project Path="MemoryPools/MemoryPools.csproj">
-      <Platform Solution="*|x86" Project="x86" />
-    </Project>
-    <Project Path="Poker.Calc.Benchmarks/Poker.Calc.Benchmarks.csproj" Id="4b293e2a-1e46-439f-8856-7fc36acef073">
-      <Platform Solution="*|x86" Project="x86" />
-    </Project>
-    <Project Path="Poker.Calc/Poker.Calc.csproj">
-      <Platform Solution="*|x86" Project="x86" />
-    </Project>
-  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
