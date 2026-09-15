@@ -78,8 +78,11 @@ namespace Infokom.Gaming.Poker.Texas
 			public double WinRateOf(int player) => _scoreDistribution[player] / (double)_scoreSum;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Estimation Estimate(Request request)
+			public static Estimation Estimate(Request request, bool monteCarlo = true)
 			{
+				if(monteCarlo)
+					return EstimateMonteCarlo(request);
+
 				int playerCount = request.Players.Length;
 				var wins = new long[playerCount];
 				long games = 0;
@@ -212,7 +215,7 @@ namespace Infokom.Gaming.Poker.Texas
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static Estimation EstimateMonteCarlo(Request request, int simulations = 1_000_000, int? seed = null, bool parallel = true)
+			public static Estimation EstimateMonteCarlo(Request request, int simulations = 100_000, int? seed = null, bool parallel = true)
 			{
 				ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(simulations, 0);
 

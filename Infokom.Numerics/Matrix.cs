@@ -54,10 +54,7 @@ namespace Infokom.Numerics
 
 		public T this[int i, int j]
 		{
-			get
-			{
-				return _data[i, j];
-			}
+			get => _data[i, j];
 
 			set
 			{

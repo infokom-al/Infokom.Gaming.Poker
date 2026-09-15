@@ -188,7 +188,6 @@ namespace TexasRangeCalc
 			AnsiConsole.Write(chart);
 		}
 
-		private const string PLAYER_COUNT = "(2..10)";
 		private static void PrintIntro()
 		{
 			AnsiConsole.Write(new Rule("[yellow]poker-equity[/]").RuleStyle("grey").LeftJustified());
