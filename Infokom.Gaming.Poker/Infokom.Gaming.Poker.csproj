@@ -11,9 +11,4 @@
 		<ProjectReference Include="..\Infokom.Numerics\Infokom.Numerics.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Exceptions\" />
-	  <Folder Include="Mappers\" />
-	</ItemGroup>
-
 </Project>

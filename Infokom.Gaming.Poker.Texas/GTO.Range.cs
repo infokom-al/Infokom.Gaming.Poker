@@ -578,6 +578,46 @@ namespace Infokom.Gaming.Poker.Texas
 				return new Range(row | col);
 			}
 
+			public static Range Create(Cell e0)
+			{
+				var data = new BitMatrix16x16();
+
+				data[e0.Position] = true;
+
+				return new Range(data);
+			}
+
+			public static Range Create(Cell e0, Cell e1)
+			{
+				var data = new BitMatrix16x16();
+
+				data[e0.Position] = true;
+				data[e1.Position] = true;
+
+				return new Range(data);
+			}
+
+			public static Range Create(Cell e0, Cell e1, Cell e2)
+			{
+				var data = new BitMatrix16x16();
+				data[e0.Position] = true;
+				data[e1.Position] = true;
+				data[e2.Position] = true;
+				return new Range(data);
+			}
+
+			public static Range Create(params ReadOnlySpan<Cell> cells)
+			{
+				var data = new BitMatrix16x16();
+				
+				foreach(var cell in cells)
+				{
+					data[cell.Position] = true;
+				}
+
+				return new Range(data);
+			}
+
 
 			public static Range Create(Func<Cell, bool> filter)
 			{

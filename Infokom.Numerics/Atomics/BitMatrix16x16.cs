@@ -10,7 +10,7 @@ namespace Infokom.Numerics.Atomics
 
 
 	[StructLayout(LayoutKind.Explicit)]
-	public unsafe struct BitMatrix16x16 : IEquatable<BitMatrix16x16>, IEqualityOperators<BitMatrix16x16, BitMatrix16x16, bool>
+	public struct BitMatrix16x16 : IEquatable<BitMatrix16x16>, IEqualityOperators<BitMatrix16x16, BitMatrix16x16, bool>
 	{
 		private const ulong ZEROS_A = ulong.MinValue, ZEROS_B = ulong.MinValue, ZEROS_C = ulong.MinValue, ZEROS_D = ulong.MinValue;
 		private const ulong UNITS_A = ulong.MaxValue, UNITS_B = ulong.MaxValue, UNITS_C = ulong.MaxValue, UNITS_D = ulong.MaxValue;
@@ -84,6 +84,13 @@ namespace Infokom.Numerics.Atomics
 					row = value ? row | BitVector16.Unit(c) : row & ~BitVector16.Unit(c);
 				}
 			}
+		}
+
+		public Bit this[Point<sbyte, sbyte> p]
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			readonly get => this[p.Y, p.X];
+			set => this[p.Y, p.X] = value;
 		}
 
 		public readonly int NNZ => BitOperations.PopCount(_00_08) + BitOperations.PopCount(_08_16) + BitOperations.PopCount(_16_24) + BitOperations.PopCount(_24_32);

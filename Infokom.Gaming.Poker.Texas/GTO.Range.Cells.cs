@@ -21,15 +21,10 @@ namespace Infokom.Gaming.Poker.Texas
 				public int Count
 				{
 					[MethodImpl(MethodImplOptions.AggressiveInlining)]
-					get
-					{
-						return _data.NNZ;
-					}
+					get => _data.NNZ;
 				}
 
-				public Enumerator GetEnumerator() => new(_data);
-				IEnumerator<Cell> IEnumerable<Cell>.GetEnumerator() => this.GetEnumerator();
-				IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
 
 
 
@@ -97,6 +92,29 @@ namespace Infokom.Gaming.Poker.Texas
 
 					readonly void IDisposable.Dispose() { }
 				}
+
+				public Enumerator GetEnumerator() => new(_data);
+				IEnumerator<Cell> IEnumerable<Cell>.GetEnumerator() => this.GetEnumerator();
+				IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+
+
+
+				public Cell[] ToArray(Cell[] target = null)
+				{
+					int n = this.Count;
+
+					Array.Resize(ref target, n);
+					using (var x = this.GetEnumerator())
+					{
+						while(x.MoveNext())
+						{
+							target[--n] = x.Current;
+						}
+					}
+					return target;
+				}
+
 			}
 
 			/// <summary>

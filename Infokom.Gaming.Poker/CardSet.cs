@@ -1,13 +1,6 @@
-using Infokom.Gaming.Poker;
-using Infokom.Numerics.Extensions;
-
-using System.Collections;
-using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.X86;
 
 namespace Infokom.Gaming.Poker
 {
@@ -360,7 +353,7 @@ namespace Infokom.Gaming.Poker
 		/// </summary>
 		/// <param name="elements">The cards.</param>
 		/// <returns>{ x | x ∈ <paramref name="elements"/> }</returns>
-		public static CardSet Select(params ReadOnlySpan<Card> elements)
+		public static CardSet Create(params ReadOnlySpan<Card> elements)
 		{
 			var collection = Φ;
 

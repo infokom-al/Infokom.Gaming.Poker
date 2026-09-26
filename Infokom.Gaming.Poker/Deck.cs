@@ -133,7 +133,6 @@ namespace Infokom.Gaming.Poker
 
 
 
-
 		public static readonly Deck Empty = default;
 		public static readonly Deck Factory = new(FACTORY_MASK);
 

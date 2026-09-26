@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Infokom.Numerics.Atomics
 {
-	public readonly partial struct Bit
+	public unsafe readonly partial struct Bit
 	{
 		/// <summary>
 		/// Represents a vector of bits backed by a binary integer type.

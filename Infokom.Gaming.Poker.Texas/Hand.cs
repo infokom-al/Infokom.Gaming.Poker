@@ -50,7 +50,7 @@ namespace Infokom.Gaming.Poker.Texas
 		{
 			//TO DO: check cardinality
 
-			return new(CardSet.Select(cards));
+			return new(CardSet.Create(cards));
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Data.SqlTypes;
-using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Text;
-
-using static Infokom.Numerics.Atomics.OEIS;
+using System.Numerics;
 
 namespace Infokom.Numerics.Atomics
 {
@@ -33,7 +26,7 @@ namespace Infokom.Numerics.Atomics
 			public static bool TryGet(int index, out TTerm value)
 			{
 				value = TERM_MASK << (index - 6);
-
+			
 				return (uint)index <= LAST_TERM_INDEX;
 			}
 		}

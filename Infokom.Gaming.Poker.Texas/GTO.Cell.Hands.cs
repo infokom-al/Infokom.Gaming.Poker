@@ -1,8 +1,5 @@
-using Infokom.Numerics;
-using Infokom.Numerics.Atomics;
-
 using System.Collections;
-using System.Diagnostics;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,108 +7,8 @@ namespace Infokom.Gaming.Poker.Texas
 {
 	public static partial class GTO
 	{
-		/// <summary>
-		/// Represents a single cell in the preflop matrix, corresponding to the smallest non empty pocket range.
-		/// </summary>
-		[DebuggerDisplay("({Row},{Col}) - {Symbol}")]
-		[StructLayout(LayoutKind.Explicit)]
 		public readonly partial struct Cell
 		{
-			private const Suit σ1 = Suit.Spade, σ2 = Suit.Diamond, σ3 = Suit.Club, σ4 = Suit.Heart;
-			[FieldOffset(0)] public readonly Rank X;
-			[FieldOffset(1)] public readonly Rank Y;
-
-			[FieldOffset(0)] public readonly Point<Rank, Rank> Location;
-
-
-			private Cell(Rank x, Rank y)
-			{
-				this.X = x;
-				this.Y = y;
-			}
-
-			public int Row
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.Ace - Y;
-			}
-			public int Col
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.Ace - X;
-			}
-
-
-
-			public bool IsValid
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => X is >= Rank.Two and <= Rank.Ace && Y is >= Rank.Two and <= Rank.Ace;
-			}
-
-			public Rank Hi
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.Max(Y, X);
-			}
-			public Rank Lo
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => Rank.Min(Y, X);
-			}
-			public bool IsCoranked
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => X == Y;
-			}
-			public bool IsCosuited
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => X < Y;
-			}
-			public bool IsUnsuited
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => X > Y;
-			}
-
-
-			public string Symbol => string.Create(3, this, (span, state) =>
-			{
-				var (x, y) = (state.X, state.Y);
-
-				if (state.IsCosuited)
-				{
-					span[0] = y.Symbol;
-					span[1] = x.Symbol;
-					span[2] = 'ₛ';
-					return;
-				}
-
-				if (state.IsUnsuited)
-				{
-					span[0] = x.Symbol;
-					span[1] = y.Symbol;
-					span[2] = 'ₒ';
-					return;
-				}
-
-				if (state.IsCoranked)
-				{
-					span[0] = span[1] = x.Symbol;
-					span[2] = ' ';
-					return;
-				}
-
-				span[0] = span[1] = span[2] = ' ';
-			});
-
-			public override string ToString() => this.Symbol;
-
-
-
-
-
 			[StructLayout(LayoutKind.Sequential)]
 			public readonly struct HandCollection : IReadOnlyCollection<CardSet>
 			{
@@ -126,10 +23,7 @@ namespace Infokom.Gaming.Poker.Texas
 					get => _owner.IsCoranked ? 6 : _owner.IsCosuited ? 4 : 12;
 				}
 
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				public Enumerator GetEnumerator() => new(_owner);
-				IEnumerator<CardSet> IEnumerable<CardSet>.GetEnumerator() => this.GetEnumerator();
-				IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+				
 
 
 
@@ -234,7 +128,88 @@ namespace Infokom.Gaming.Poker.Texas
 
 					readonly void IDisposable.Dispose() { }
 				}
+
+				[MethodImpl(MethodImplOptions.AggressiveInlining)]
+				public Enumerator GetEnumerator() => new(_owner);
+				IEnumerator<CardSet> IEnumerable<CardSet>.GetEnumerator() => this.GetEnumerator();
+				IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+
+				/// <summary>
+				/// Copies the hands in this collection to a span.
+				/// </summary>
+				/// <param name="target">The span to copy the hands to.</param>
+				/// <returns>The number of hands copied to the target span.</returns>
+				public int CopyTo(Span<CardSet> target)
+				{
+					int n = 0;
+					
+					using (var x = this.GetEnumerator())
+					{
+						while(x.MoveNext() && n < target.Length)
+						{
+							target[n++] = x.Current;
+						}
+					}
+
+					return n;
+				}
+
+				public int CopyTo(Span<CardSet> target, int startIndex)
+				{
+					int n = startIndex;
+
+					using (var x = this.GetEnumerator())
+					{
+						while (x.MoveNext() && n < target.Length)
+						{
+							target[n++] = x.Current;
+						}
+					}
+
+					return n;
+				}
+
+				public CardSet[] ToArray()
+				{
+					int n = this.Count;
+					Span<CardSet> data = stackalloc CardSet[n];
+
+					using (var x = this.GetEnumerator())
+					{
+						while (x.MoveNext())
+						{
+							data[--n] = x.Current;
+						}
+					}
+
+					return data.ToArray();
+				}
+
+				/// <summary>
+				/// Copies the hands in this collection to an array. The array is resized exactly to fit all the hands.
+				/// </summary>
+				/// <param name="target">The array to copy the hands to. If it is null, a new array will be created. If it is undersized/oversized, 
+				/// it will be resized exactly to fit all the hands, neither more nor less.</param>
+				/// <returns>The array containing the copied hands.</returns>
+				public CardSet[] ToArray(CardSet[] target = null)
+				{
+					int n = this.Count;
+
+					Array.Resize(ref target, n);
+
+					using (var x = this.GetEnumerator())
+					{
+						while (x.MoveNext())
+						{
+							target[n++] = x.Current;
+						}
+					}
+
+					return target;
+				}
 			}
+
 
 			/// <summary>
 			/// Collection of hands for the current cell.
@@ -245,10 +220,5 @@ namespace Infokom.Gaming.Poker.Texas
 				get => new(this);
 			}
 		}
-
-
-
-
-
 	}
 }

@@ -1,32 +1,34 @@
-﻿using Infokom.Numerics.Extensions;
+using Infokom.Numerics.Extensions;
 
 using System.Collections;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 
+using static Infokom.Numerics.Extensions.Functions;
+
 namespace Infokom.Numerics.Atomics
 {
-	public readonly struct Binary<TData> where TData : unmanaged, IBinaryInteger<TData>, IUnsignedNumber<TData>
+	public readonly partial struct Binary<TData> where TData : unmanaged, IBinaryInteger<TData>, IUnsignedNumber<TData>
 	{
-		private readonly TData _value;
+		private readonly TData _bits;
 
-		private Binary(TData mask) => _value = mask;
+		private Binary(TData bits) => _bits = bits;
 
 		public bool IsEmpty
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => TData.IsZero(_value);
+			get => TData.IsZero(_bits);
 		}
 
 		public int Count
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => int.CreateChecked(TData.PopCount(_value));
+			get => int.CreateChecked(TData.PopCount(_bits));
 		}
 
 
-		public static readonly int Capacity = Unsafe.SizeOf<TData>() * 8;
+		public static readonly int SIZE = Unsafe.SizeOf<TData>() * 8;
 
 		public static readonly Binary<TData> Φ = default;
 		public static readonly Binary<TData> Ω = new(TData.AllBitsSet);
@@ -35,38 +37,17 @@ namespace Infokom.Numerics.Atomics
 
 
 
-		public static implicit operator TData(Binary<TData> source) => source._value;
+		public static implicit operator TData(Binary<TData> source) => source._bits;
+
+
+
 	}
 
 	public static partial class Binary
 	{
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ref Binary<T> AsBinary<T>(this ref T source) where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> => ref Unsafe.As<T, Binary<T>>(ref source);
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="source"></param>
-		/// <returns></returns>
-		[method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Binary<T> ToBinary<T>(this T source) where T : unmanaged, IBinaryInteger<T>, IUnsignedNumber<T> => Unsafe.BitCast<T, Binary<T>>(source);
-
-
-
 		
-	}
-
-
-	public static partial class Binary
-	{
-
+		
+		
 
 
 		public static Iterator Combinations(ulong source, int k) =>new(source, k);

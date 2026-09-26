@@ -8,26 +8,10 @@ using System.Runtime.Intrinsics.X86;
 
 namespace Infokom.Numerics.Extensions
 {
-
+#pragma warning restore IDE1006 // Naming Styles
 
 	public static partial class BinaryInteger
 	{
-
-		extension<T>(T) where T : IBinaryInteger<T>
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static T BitSet(Range range)
-			{
-				var (k, n) = range.GetOffsetAndLength(16);
-
-				return n > 0 ? ((~(T.AllBitsSet << n)) << k) : default;
-			}
-		}
-
-
-
-
-
 
 
 		#region BIT SCAN RANDOM
@@ -118,6 +102,13 @@ namespace Infokom.Numerics.Extensions
 			return true;
 		}
 
+		/// <summary>
+		/// Find a non-zero bit from a binary. No guarantee on which bit is found if multiple bits are set.
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <param name="offset">Index of the non-zero bit found</param>
+		/// <param name="target">Binary value with the non-zero bit isolated</param>
+		/// <returns>True if a non-zero bit is found; otherwise, false</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool BitScanRandom(this ulong source, out sbyte offset, out ulong target)
 		{
@@ -128,10 +119,77 @@ namespace Infokom.Numerics.Extensions
 				return false;
 			}
 
-			target = (source & ~(1ul << (offset = source.BitScanShuffle())));
+			var k = int.Random(0, BitOperations.PopCount(source));
+			if(Bmi2.X64.IsSupported)
+			{
+				target = Bmi2.X64.ParallelBitDeposit(1ul << k, source);
+			}
+			else
+			{
+				while (k-- > 0)
+					source &= source - 1;
+				target = source & (0UL - source);
+			}
+			offset = (sbyte)BitOperations.TrailingZeroCount(target);
 			return true;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ulong BitIsolateRandom(this ulong source)
+		{
+			if (source == default)
+				return default;
+			var k = int.Random(0, BitOperations.PopCount(source));
+			if (Bmi2.X64.IsSupported)
+			{
+				return Bmi2.X64.ParallelBitDeposit(1ul << k, source);
+			}
+			else
+			{
+				while (k-- > 0)
+					source &= source - 1;
+				return source & (0UL - source);
+			}
+		}
+
+		/// <summary>
+		/// Find a specific number of non-zero bits from a binary. No guarantee on which bits are found if multiple bits are set.
+		/// </summary>
+		/// <param name="source">Binary value to scan</param>
+		/// <param name="count">Number of non-zero bits to find</param>
+		/// <returns>Binary value with the specified number of non-zero bits isolated</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ulong BitIsolateRandom(this ulong source, int count)
+		{
+			if (source == default || count <= 0)
+				return default;
+			int n = BitOperations.PopCount(source);
+			if (count >= n)
+				return source;
+
+			ulong result = 0;
+			for (int i = 0; i < count; i++)
+			{
+				var j = int.Random(0, n);
+				ulong selected;
+				if (Bmi2.X64.IsSupported)
+				{
+					selected = Bmi2.X64.ParallelBitDeposit(1ul << j, source);
+				}
+				else
+				{
+					var tempSource = source;
+					while (j-- > 0)
+						tempSource &= tempSource - 1;
+					selected = tempSource & (0UL - tempSource);
+				}
+
+				result |= selected;
+				source &= ~selected;
+				n--;
+			}
+			return result;
+		}
 
 		#endregion
 
@@ -668,91 +726,6 @@ namespace Infokom.Numerics.Extensions
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			public ulong BitClear(int index) => source &= ~(1ul << index);
 
-			/// <summary>
-			/// Bit scan forward. Returns bit index of lowest set bit in input.
-			/// </summary>
-			public int BSF
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => source == default ? -1 : source.TZC;
-			}
-
-			/// <summary>
-			/// Bit scan reverse. Returns bit index of highest set bit in input
-			/// </summary>
-			public int BSR
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => source == default ? -1 : 63 - source.LZC;
-			}
-
-
-
-			public ulong HI
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => 1UL << source.BSR;
-			}
-
-			public ulong LO
-			{
-				[MethodImpl(MethodImplOptions.AggressiveInlining)]
-				get => 1UL << source.BSF;
-			}
-
-
-
-
-			public (ulong HI, ulong LO) HILO(Index index)
-			{
-				// Merr vlerën numerike të indeksit (p.sh. ^3 bëhet 3, dhe 3 mbetet 3)
-				int n = index.Value;
-				int totalBits = source.CNT;
-
-				var (hi, lo) = (0ul, source);
-
-				if (n <= 0)
-				{
-					if (index.IsFromEnd) (hi, lo) = (lo, hi);
-					return (hi, lo);
-				}
-
-				if (n >= totalBits)
-				{
-					if (!index.IsFromEnd) (hi, lo) = (lo, hi);
-					return (hi, lo);
-				}
-
-
-				if (index.IsFromEnd)//LOHI
-				{
-					(hi, lo) = (lo, hi);
-					for (int i = 0; i < n; i++)
-					{
-						ulong currentLo = hi.LO;
-						lo |= currentLo;
-						hi ^= currentLo;
-					}
-					hi = source ^ lo;
-
-					return (hi, lo);
-				}
-
-
-
-				//HILO
-				hi = 0ul;
-				lo = source;
-				for (int i = 0; i < n; i++)
-				{
-					ulong currentHi = lo.HI;
-					hi |= currentHi;
-					lo ^= currentHi;
-				}
-				lo = source ^ hi;
-
-				return (hi, lo);
-			}
 		}
 
 
@@ -832,8 +805,6 @@ namespace Infokom.Numerics.Extensions
 			/// <param name="weight">The weight of the mask; the number of elements to pick from the source.</param>
 			/// <returns>An iterator that enumerates all valid submasks.</returns>
 			public Iterator BitChoose(int k) => new(X, k);
-
-			public Binary<ushort> Bits => X.AsBinary();
 		}
 
 		/// <summary>
@@ -955,11 +926,6 @@ namespace Infokom.Numerics.Extensions
 
 	public static class UInt32BitChoose
 	{
-		extension(uint X)
-		{
-			public Binary<uint> Bits => X.AsBinary();
-		}
-
 		extension(Binary<uint> X)
 		{
 			public Collection Choose(int k) => new(X, k);
@@ -1035,11 +1001,6 @@ namespace Infokom.Numerics.Extensions
 
 	public static class UInt64BitChoose
 	{
-		extension(ulong X)
-		{
-			public Binary<ulong> Bits => X.AsBinary();
-		}
-
 		extension(Binary<ulong> X)
 		{
 			public Collection Choose(int k) => new(X, k);
