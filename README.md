@@ -1,4 +1,4 @@
-![Alt Text] (https://github.com/infokom-al/Infokom.Gaming.Poker/blob/dev/GTO%20Heatmap.gif)
+![Alt Text](https://github.com/infokom-al/Infokom.Gaming.Poker/blob/dev/GTO%20Heatmap.gif?raw=true)
 
 # Infokom.Gaming.Poker
 
