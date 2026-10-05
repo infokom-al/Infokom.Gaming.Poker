@@ -468,7 +468,7 @@ namespace Infokom.Gaming.Poker.Texas
 			/// └                                                     ┘
 			/// ]]>
 			/// </summary>
-			public static Range Ω => new(RANGE_Ω);
+			public static readonly Range Ω = new(RANGE_Ω);
 
 
 			/// <summary>

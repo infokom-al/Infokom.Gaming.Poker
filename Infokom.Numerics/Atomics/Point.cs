@@ -129,6 +129,15 @@ namespace Infokom.Numerics.Atomics
 			public static Point<T, T, T, T> UnitY => new(T.Zero, T.One, T.Zero, T.Zero);
 			public static Point<T, T, T, T> UnitZ => new(T.Zero, T.Zero, T.One, T.Zero);
 			public static Point<T, T, T, T> UnitW => new(T.Zero, T.Zero, T.Zero, T.One);
+
+
+			public static Point<T, T, T, T> operator *(Point<T, T, T, T> p, T scalar) => new(p.X * scalar, p.Y * scalar, p.Z * scalar, p.W * scalar);
+			public static Point<T, T, T, T> operator /(Point<T, T, T, T> p, T scalar) => new(p.X / scalar, p.Y / scalar, p.Z / scalar, p.W / scalar);
+
+
+			public static Point<T, T, T, T> operator +(Point<T, T, T, T> p1, Point<T, T, T, T> p2) => new(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z, p1.W + p2.W);
+
+			public static Point<T, T, T, T> operator -(Point<T, T, T, T> p1, Point<T, T, T, T> p2) => new(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z, p1.W - p2.W);
 		}
 	}
 	#endregion	

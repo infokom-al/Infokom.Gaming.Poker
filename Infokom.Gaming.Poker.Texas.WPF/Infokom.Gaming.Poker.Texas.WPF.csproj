@@ -5,7 +5,16 @@
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>WinExe</OutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Infokom.Gaming.Poker.Texas\Infokom.Gaming.Poker.Texas.csproj" />

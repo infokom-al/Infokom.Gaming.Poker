@@ -1,0 +1,9 @@
+<Application x:Class="Infokom.Gaming.Poker.Texas.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Infokom.Gaming.Poker.Texas.WPF"
+             StartupUri="GTORangePicker.xaml">
+	<Application.Resources>
+
+	</Application.Resources>
+</Application>

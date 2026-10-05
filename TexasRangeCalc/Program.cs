@@ -1,4 +1,5 @@
 using Infokom.Gaming.Poker.Texas;
+using Infokom.Gaming.Poker.Texas.CLI;
 using Infokom.Gaming.Poker.Texas.Estimators;
 using Infokom.Numerics.Extensions;
 
@@ -15,22 +16,31 @@ namespace TexasRangeCalc
 			AnsiConsole.Clear();
 		}
 
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
-			GTOChart.GenerateHeatmap(9).Print();
+			AnsiConsole.GTO().Heatmap(1).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(2).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(3).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(4).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(5).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(6).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(7).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(8).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(9).Generator().Generate().Print();
 
-			PrintIntro();
 
-			if (args.Length > 0)
-			{
-				EstimateCli(args);
-				return;
-			}
+			//PrintIntro();
 
-			EstimateInteractive();
+			//if (args.Length > 0)
+			//{
+			//	await EstimateCliAsync(args);
+			//	return;
+			//}
+
+			//await EstimateInteractive();
 		}
 
-		private static void EstimateCli(string[] args)
+		private static async Task EstimateCliAsync(string[] args)
 		{
 			int i = 0;
 
@@ -69,10 +79,10 @@ namespace TexasRangeCalc
 				}
 			}
 
-			RunEstimate(rangeArgs);
+			await RunEstimate(rangeArgs);
 		}
 
-		private static void EstimateInteractive()
+		private static async Task EstimateInteractive()
 		{
 			AnsiConsole.MarkupLine("[yellow]Interactive mode[/]");
 			AnsiConsole.MarkupLine("[grey]Type 'exit' at any prompt to quit.[/]");
@@ -95,7 +105,7 @@ namespace TexasRangeCalc
 
 			if (cancelled) return;
 
-			RunEstimate(rangeArgs);
+			await RunEstimate(rangeArgs);
 		}
 
 		private static async Task RunEstimate(IReadOnlyList<string> rangeArgs)

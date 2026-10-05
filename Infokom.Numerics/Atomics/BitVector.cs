@@ -6,14 +6,14 @@ using System.Security.Cryptography.X509Certificates;
 namespace Infokom.Numerics.Atomics
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct BitVector08 : IEquatable<BitVector08>, IEqualityOperators<BitVector08, BitVector08, bool>, IShiftOperators<BitVector08, int, BitVector08>
+	public struct BitVector8 : IEquatable<BitVector8>, IEqualityOperators<BitVector8, BitVector8, bool>, IShiftOperators<BitVector8, int, BitVector8>
 	{
 		private const byte ZEROS = byte.MinValue;
 		private const byte UNITS = byte.MaxValue;
 		private byte _bits;	
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private BitVector08(byte bits) => _bits = bits;
+		private BitVector8(byte bits) => _bits = bits;
 
 		/// <summary>
 		/// Gets or sets the value of the bit at the specified index in the <see cref="BitVector"/> instance.
@@ -44,20 +44,20 @@ namespace Infokom.Numerics.Atomics
 
 		public readonly override string ToString() => _bits.ToString("B8");
 		public readonly override int GetHashCode() => _bits.GetHashCode();
-		public readonly bool Equals(BitVector08 other) => _bits.Equals(other._bits);
-		public readonly override bool Equals(object obj) => obj is BitVector08 other && Equals(other);
-		public static bool operator ==(BitVector08 v1, BitVector08 v2) => v1._bits == v2._bits;
-		public static bool operator !=(BitVector08 v1, BitVector08 v2) => v1._bits != v2._bits;
+		public readonly bool Equals(BitVector8 other) => _bits.Equals(other._bits);
+		public readonly override bool Equals(object obj) => obj is BitVector8 other && Equals(other);
+		public static bool operator ==(BitVector8 v1, BitVector8 v2) => v1._bits == v2._bits;
+		public static bool operator !=(BitVector8 v1, BitVector8 v2) => v1._bits != v2._bits;
 
 		/// <summary>
 		/// A <see cref="BitVector"/> instance with all bits <see cref="Bit.Zero">0</see>.
 		/// </summary>
-		public static readonly BitVector08 Zeros = new(ZEROS);
+		public static readonly BitVector8 Zeros = new(ZEROS);
 
 		/// <summary>
 		/// A <see cref="BitVector"/> instance with all bits <see cref="Bit.Unit">1</see>.
 		/// </summary>
-		public static readonly BitVector08 Units = new(UNITS);
+		public static readonly BitVector8 Units = new(UNITS);
 
 		/// <summary>
 		/// Performs a bitwise left shift operation on the specified <see cref="BitVector"/> instance by the specified number of bits.
@@ -65,7 +65,7 @@ namespace Infokom.Numerics.Atomics
 		/// <param name="source">The <see cref="BitVector"/> instance to shift.</param>
 		/// <param name="offset">The number of bits to shift.</param>
 		/// <returns>A new <see cref="BitVector"/> instance with the bits shifted to the left by the specified offset.</returns>
-		public static BitVector08 operator <<(BitVector08 source, int offset) => new((byte)(source._bits << offset));
+		public static BitVector8 operator <<(BitVector8 source, int offset) => new((byte)(source._bits << offset));
 
 		/// <summary>
 		/// Performs a bitwise right shift operation on a <see cref="BitVector"/> instance by certain number of bits.
@@ -73,7 +73,7 @@ namespace Infokom.Numerics.Atomics
 		/// <param name="source">The <see cref="BitVector"/> instance to shift.</param>
 		/// <param name="offset">The number of bits to shift.</param>
 		/// <returns>A new <see cref="BitVector"/> instance with the bits shifted to the right by the specified offset.</returns>
-		public static BitVector08 operator >>(BitVector08 source, int offset) => new((byte)(source._bits >> offset));
+		public static BitVector8 operator >>(BitVector8 source, int offset) => new((byte)(source._bits >> offset));
 
 		/// <summary>
 		/// Performs a bitwise left shift operation on the specified <see cref="BitVector"/> instance by the specified number of bits.
@@ -81,21 +81,21 @@ namespace Infokom.Numerics.Atomics
 		/// <param name="source">The <see cref="BitVector"/> instance to shift.</param>
 		/// <param name="offset">The number of bits to shift.</param>
 		/// <returns>A new <see cref="BitVector"/> instance with the bits shifted to the right by the specified offset.</returns>
-		static BitVector08 IShiftOperators<BitVector08, int, BitVector08>.operator >>>(BitVector08 source, int offset) => source >> offset;
+		static BitVector8 IShiftOperators<BitVector8, int, BitVector8>.operator >>>(BitVector8 source, int offset) => source >> offset;
 
 
 
-		public static implicit operator ushort(BitVector08 vector) => vector._bits;
-		public static implicit operator BitVector08(byte value) => new(value);
+		public static implicit operator ushort(BitVector8 vector) => vector._bits;
+		public static implicit operator BitVector8(byte value) => new(value);
 
-		public static explicit operator BitVector08(ushort value) => new((byte)value);
-		public static explicit operator checked BitVector08(ushort value) => new(checked((byte)value));
+		public static explicit operator BitVector8(ushort value) => new((byte)value);
+		public static explicit operator checked BitVector8(ushort value) => new(checked((byte)value));
 
-		public static explicit operator BitVector08(uint value) => new((byte)value);
-		public static explicit operator checked BitVector08(uint value) => new(checked((byte)value));
+		public static explicit operator BitVector8(uint value) => new((byte)value);
+		public static explicit operator checked BitVector8(uint value) => new(checked((byte)value));
 
-		public static explicit operator BitVector08(ulong value) => new((byte)value);
-		public static explicit operator checked BitVector08(ulong value) => new(checked((byte)value));
+		public static explicit operator BitVector8(ulong value) => new((byte)value);
+		public static explicit operator checked BitVector8(ulong value) => new(checked((byte)value));
 	}
 
 
@@ -107,8 +107,8 @@ namespace Infokom.Numerics.Atomics
 
 		[FieldOffset(0)] private ushort _bits;
 
-		[FieldOffset(0)] public BitVector08 Lower;
-		[FieldOffset(1)] public BitVector08 Upper;
+		[FieldOffset(0)] public BitVector8 Lower;
+		[FieldOffset(1)] public BitVector8 Upper;
 
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -630,7 +630,7 @@ namespace Infokom.Numerics.Atomics
 	{
 		extension(in byte source)
 		{
-			public ref BitVector08 Bits => ref Unsafe.As<byte, BitVector08>(ref Unsafe.AsRef(in source));
+			public ref BitVector8 Bits => ref Unsafe.As<byte, BitVector8>(ref Unsafe.AsRef(in source));
 		}
 
 		extension(in ushort source)

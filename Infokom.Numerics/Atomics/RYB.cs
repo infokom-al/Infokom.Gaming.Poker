@@ -40,7 +40,7 @@ namespace Infokom.Numerics.Atomics
 		public bool Equals(RYB other)
 			=> _value == other._value;
 
-		public override bool Equals(object? obj)
+		public override bool Equals(object obj)
 			=> obj is RYB other && Equals(other);
 
 		public override int GetHashCode()
@@ -53,13 +53,4 @@ namespace Infokom.Numerics.Atomics
 			=> left._value != right._value;
 	}
 
-
-	public static class ColorExtensions
-	{
-		extension(Color source)
-		{
-			public void Deconstruct(out byte r, out byte g, out byte b) => (r, g, b) = (source.R, source.G, source.B);
-			public void Deconstruct(out byte a, out byte r, out byte g, out byte b) => (a, r, g, b) = (source.A, source.R, source.G, source.B);
-		}
-	}
 }

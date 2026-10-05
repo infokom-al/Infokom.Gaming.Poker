@@ -13,11 +13,11 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 			private readonly int[] _soleWins;
 			private readonly int[] _sharedWins;
 			private readonly int[] _topFinishes;
-			private readonly float[] _equityShares;
+			private readonly double[] _equityShares;
 			private readonly int _trials;
 			private readonly int _litigants;
 
-			public Response(ulong id, int litingants, int[] soleWins, int[] sharedWins, int[] topFinishes, float[] equityShares, int trials)
+			public Response(ulong id, int litingants, int[] soleWins, int[] sharedWins, int[] topFinishes, double[] equityShares, int trials)
 			{
 				Id = id;
 				_litigants = litingants;
@@ -38,13 +38,10 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 			public int LitigantCount => _litigants;
 
 			public int WinCountOf(int litigantIndex) => _soleWins[litigantIndex];
-			public float WinRateOf(int litigantIndex) => (float)_soleWins[litigantIndex] / _trials;
+			public double WinRateOf(int litigantIndex) => (double)_soleWins[litigantIndex] / _trials;
+			public double EquityOf(int litigantIndex) => _topFinishes[litigantIndex] * _equityShares[litigantIndex] / _trials;
 
-
-			public readonly record struct Score(int SoleWins, int SharedWins, int TopFinishes, double EquityShare)
-			{
-				public float Equity => (float)(EquityShare * 100d);
-			}
+			public readonly record struct Score(int SoleWins, int SharedWins, int TopFinishes, double EquityShare);
 
 
 			

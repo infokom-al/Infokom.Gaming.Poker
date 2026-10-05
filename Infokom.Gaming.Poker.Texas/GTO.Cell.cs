@@ -83,7 +83,7 @@ namespace Infokom.Gaming.Poker.Texas
 				{
 					span[0] = y.Symbol;
 					span[1] = x.Symbol;
-					span[2] = 'ₛ';
+					span[2] = 's';
 					return;
 				}
 
@@ -91,7 +91,7 @@ namespace Infokom.Gaming.Poker.Texas
 				{
 					span[0] = x.Symbol;
 					span[1] = y.Symbol;
-					span[2] = 'ₒ';
+					span[2] = 'o';
 					return;
 				}
 

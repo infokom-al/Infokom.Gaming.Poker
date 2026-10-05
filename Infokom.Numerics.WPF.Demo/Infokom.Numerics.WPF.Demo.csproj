@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infokom.Gaming.Poker.Texas.WPF\Infokom.Gaming.Poker.Texas.WPF.csproj" />
+    <ProjectReference Include="..\Infokom.Numerics.WPF\Infokom.Numerics.WPF.csproj" />
   </ItemGroup>
 
 </Project>

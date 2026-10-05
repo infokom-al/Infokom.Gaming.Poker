@@ -20,6 +20,7 @@ namespace Infokom.Numerics.Atomics
 		public static readonly Bit Unit = new(UNIT);
 
 		public static readonly Bit Φ = Zero;
+
 		public static readonly Bit Ω = Unit;
 
 		public static bool operator true(Bit bit) => bit._value;

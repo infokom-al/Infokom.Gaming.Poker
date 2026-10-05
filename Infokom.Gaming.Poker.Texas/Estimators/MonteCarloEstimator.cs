@@ -13,12 +13,12 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 	public partial class MonteCarloEstimator
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static void AccumulateOutcome(ulong winnersMask, Span<int> soleWins, Span<int> sharedWins, Span<int> topFinishes, Span<float> equityShares, ref int games)
+		private static void AccumulateOutcome(ulong winnersMask, Span<int> soleWins, Span<int> sharedWins, Span<int> topFinishes, Span<double> equityShares, ref int games)
 		{
 			games++;
 
 			int winnerCount = BitOperations.PopCount(winnersMask);
-			float share = 1f / winnerCount;
+			double share = 1.0 / winnerCount;
 			bool shared = winnerCount > 1;
 
 			while (winnersMask != 0)
@@ -152,7 +152,7 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 			public InlineArray10<int> SoleWins;
 			public InlineArray10<int> SharedWins;
 			public InlineArray10<int> TopFinishes;
-			public InlineArray10<float> EquityShares;
+			public InlineArray10<double> EquityShares;
 			private fixed ulong _pockets[10];
 			public unsafe Span<CardSet> Pockets => MemoryMarshal.CreateSpan(ref Unsafe.As<ulong, CardSet>(ref _pockets[0]), Litigants);
 		}
@@ -175,7 +175,7 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static Response Handle(Request request)
+		public static Response Handle(Request request)
 		{
 			ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -206,7 +206,7 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 
 			}
 
-			int workerCount = Math.Min(Environment.ProcessorCount, trials);
+			int workerCount = Math.Min((int)Math.Ceiling(Environment.ProcessorCount/2.0), trials);
 			var workerStates = new MonteCarloEstimatorWorkerState[workerCount];
 			
 			_ = Parallel.For(0, workerCount, worker =>
@@ -223,7 +223,7 @@ namespace Infokom.Gaming.Poker.Texas.Estimators
 			var soleWins = new int[m];
 			var sharedWins = new int[m];
 			var topFinishes = new int[m];
-			var equityShares = new float[m];
+			var equityShares = new double[m];
 			int games = 0;
 
 

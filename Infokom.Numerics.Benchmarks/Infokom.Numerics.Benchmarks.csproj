@@ -11,12 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Infokom.Numerics\Infokom.Numerics.csproj"/>
+		<ProjectReference Include="..\Infokom.Numerics\Infokom.Numerics.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.16.0-preview.1" />
 		<PackageReference Include="BenchmarkDotNet.Annotations" Version="0.16.0-preview.1" />
+		<PackageReference Include="Spectre.Console" Version="0.57.2" />
 	</ItemGroup>
 
 	

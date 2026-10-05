@@ -15,7 +15,7 @@ namespace Infokom.Gaming.Poker.Texas
 {
 
 
-
+	
 	
 
 	public static partial class Equity

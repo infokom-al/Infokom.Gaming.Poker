@@ -1,174 +1,217 @@
 //using static Infokom.Numerics.Atomics.FloatingPointConstant;
+using System.Drawing;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Xml.XPath;
 
-using static Infokom.Numerics.Extensions.Constant;
+using Infokom.Numerics.Extensions;
+using static Infokom.Numerics.Extensions.Functions;
 
 namespace Infokom.Numerics.Atomics
 {
+	public interface IColor
+	{
+		public float Red { get; }
+		public float Green { get; }
+		public float Blue { get; }
+		public float Alpha { get; }
+	}
+
 
 
 	/// <summary>
-	/// Represents a color in the RGBA byte-order scheme where each channel is represented by a byte (0-255).
+	/// Binary data for ARGB32 color format.
 	/// </summary>
 	/// <remarks>
-	/// In OpenGL and Portable Network Graphics (PNG), the RGBA byte order is used, where the colors are stored in memory such that R is at the 
-	/// lowest address, G after it, B after that, and A last. On a little endian architecture this is equivalent to ABGR32. 
+	/// 0xRR_GG_BB
 	/// </remarks>
-	[StructLayout(LayoutKind.Explicit)]
-	public readonly struct RGBA
+	[StructLayout(LayoutKind.Explicit, Size = 3)]
+	public readonly struct RGB24 : IColor
 	{
+		private const uint B = 0x00_00_FF;
+		private const uint G = 0x00_FF_00;
+		private const uint R = 0xFF_00_00;
+
 		[FieldOffset(0)] private readonly uint _data;
+		[FieldOffset(0)] private readonly byte _b;
+		[FieldOffset(1)] private readonly byte _g;
+		[FieldOffset(2)] private readonly byte _r;
 
-		private RGBA(uint data) => _data = data;
+		[FieldOffset(0)] private readonly InlineArray3<BitVector8> _channels;
+
+		private RGB24(uint data) => _data = data;
+
+		private RGB24(byte r, byte g, byte b) => (_r, _g, _b) = (r, g, b);
+
+		public float Red => _r / 255f;
+		public float Green => _g / 255f;
+		public float Blue => _b / 255f;
+		float IColor.Alpha => throw new NotSupportedException();
+
+
+
+		public override string ToString() => $"{_r:X2}{_g:X2}{_b:X2}";
 
 
 		/// <summary>
-		/// Red channel of this RGBA encoded color.
+		/// Creates a new RGB24 color from normalized float values for red, green, and blue channels.
 		/// </summary>
-		[FieldOffset(0)] public readonly byte R;
-
-		/// <summary>
-		/// Green channel of this RGBA encoded color.
-		/// </summary>
-		[FieldOffset(1)] public readonly byte G;
-
-		/// <summary>
-		/// Blue channel of this RGBA encoded color.
-		/// </summary>
-		[FieldOffset(2)] public readonly byte B;
-
-		/// <summary>
-		/// Alpha channel of this RGBA encoded color.
-		/// </summary>
-		[FieldOffset(3)] public readonly byte A;
-
-		private RGBA(byte r, byte g, byte b, byte a) => (R, G, B, A) = (r, g, b, a);
-
-
-
-		public void Deconstruct(out byte r, out byte g, out byte b, out byte a) => (r, g, b, a) = (R, G, B, A);
-
-
-		public static RGBA operator *(RGBA x, float k)
-		{	
-		
-			var a = x.A / 255f;
-			var b = x.B / 255f;
-			var g = x.G / 255f;
-			var r = x.R / 255f;
-
-			b *= a;
-			g *= a;
-			r *= a;
-
-			b /= (r + g + b);
-			g /= (r + g + b);
-			r /= (r + g + b);
-
-
-			//ka = b+g+r
-			//a = (b+g+r)/k
-
-			a = (b + g + r) / k;
-
-			a /= (b + g + r + a);
-			b /= (b + g + r + a);
-			g /= (b + g + r + a);
-			r /= (b + g + r + a);
-
-			return new RGBA((byte)(r*255), (byte)(g*255), (byte)(b*255), (byte)(a * 255));
-		}
-
-		public static RGBA operator +(RGBA x, RGBA y)
+		/// <param name="r">The red component (0.0 to 1.0).</param>
+		/// <param name="g">The green component (0.0 to 1.0).</param>
+		/// <param name="b">The blue component (0.0 to 1.0).</param>
+		/// <returns>A new RGB24 color.</returns>
+		/// <remarks>
+		/// (r,g,b) is assumed to be normalized so that their sum equals 1.0. If not, a normalization step is performed to ensure the resulting color is valid.
+		/// </remarks>
+		public static RGB24 Create(float r, float g, float b) 
 		{
-			var A = x.A + y.A * (1 - x.A);
-			var B = x.B * x.A + y.B * y.A * (1 - x.A);
-			var G = x.G * x.A + y.G * y.A * (1 - x.A);
-			var R = x.R * x.A + y.R * y.A * (1 - x.A);
+			(r, g, b) = 255f * (r, g, b) / (r + g + b);
 
-			var (r, g, b, a) = ((byte)(R * 255), (byte)(G * 255), (byte)(B * 255), (byte)(A * 255));
-
-			return new RGBA(r, g, b, a);
+			return new((byte)r, (byte)g, (byte)b);
 		}
 
 
 
 
-		public static readonly RGBA Zero = new(0x00000000);
-		public static readonly RGBA UnitR = new(0x000000FF);
-		public static readonly RGBA UnitG = new(0x0000FF00);
-		public static readonly RGBA UnitB = new(0x00FF0000);
-		public static readonly RGBA UnitA = new(0xFF000000);
+		public static explicit operator RGB24(uint data) => new(data);
+		public static implicit operator uint(RGB24 color) => color._data;
 
 
-		public static readonly RGBA Transparent = new(0x00000000);
-
-		public static readonly RGBA Black	= new(0xFF000000);
-		public static readonly RGBA Red	= new(0xFF0000FF);
-		public static readonly RGBA Green	= new(0xFF00FF00);
-		public static readonly RGBA Blue	= new(0xFFFF0000);
-
-
-		public static readonly RGBA Orange = Red + Green * 0.5f;
-		public static readonly RGBA Yellow = Red + Green;
-		public static readonly RGBA Cyan = Green + Blue;
-		public static readonly RGBA Magenta = Red + Blue;
-		public static readonly RGBA White = Red + Green + Blue;
-
-
-
-
-		/// <summary>
-		/// Color from the heat map gradient based on the given weight (0.0 to 1.0).
-		/// </summary>
-		/// <param name="x">The weight value between 0.0 and 1.0. </param>
-		/// <returns>
-		/// red: hot
-		/// green: warm
-		/// blue: cold
-		/// </returns>
-		public static RGBA Heat(float x)
-		{
-			ArgumentOutOfRangeException.ThrowIfNegative(x, nameof(x));
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(x, 1f, nameof(x));
-
-
-			var p = Point<double, double, double>.Zeros;
-			p.X = x < 0.5f ? 0     : -1 + 2 * x;
-			p.Y = x < 0.5f ? x * 2 :  1 - 2 * x;	
-			p.Z = x > 0.5f ? 0     :  1 - 2 * x;
-
-			return Red * (float)p.X + Green * (float)p.Y + Blue * (float)p.Z;
-		}
+		public static RGB24 operator ~(RGB24 x) => new(~x._data);
+		public static RGB24 operator &(RGB24 x, RGB24 y) => new(x._data & y._data);
+		public static RGB24 operator |(RGB24 x, RGB24 y) => new(x._data | y._data);
+		public static RGB24 operator ^(RGB24 x, RGB24 y) => new(x._data ^ y._data);
 	}
 
 
 
 
+
+
 	/// <summary>
-	/// Represents a color in the BGRA byte-order scheme where each channel is represented by a byte (0-255).
+	/// Binary data for ARGB32 color format.
 	/// </summary>
+	/// <remarks>
+	/// 0xAA_RR_GG_BB
+	/// </remarks>
 	[StructLayout(LayoutKind.Explicit)]
-	public struct BGRA
+	public readonly struct ARGB32 : IColor
+	{
+		private const uint B = 0x00_00_00_FF;
+		private const uint G = 0x00_00_FF_00;
+		private const uint R = 0x00_FF_00_00;
+		private const uint A = 0xFF_00_00_00;
+
+		[FieldOffset(0)] private readonly uint _data;
+		[FieldOffset(0)] private readonly byte _r;
+		[FieldOffset(1)] private readonly byte _g;
+		[FieldOffset(2)] private readonly byte _b;
+		[FieldOffset(3)] private readonly byte _a;
+
+		[FieldOffset(0)] public readonly ByteVector4 Channels;		
+
+		private ARGB32(uint data) => _data = data;
+
+		public float Red => _r / 255f;
+		public float Green => _g / 255f;
+		public float Blue => _b / 255f;
+		public float Alpha => _a / 255f;
+
+		public static implicit operator ARGB32(uint data) => new(data);
+		public static implicit operator uint(ARGB32 color) => color._data;
+
+		public static ARGB32 operator ~(ARGB32 x) => new (~x._data);
+		public static ARGB32 operator &(ARGB32 x, ARGB32 y) => new(x._data & y._data);
+		public static ARGB32 operator |(ARGB32 x, ARGB32 y) => new(x._data | y._data);
+		public static ARGB32 operator ^(ARGB32 x, ARGB32 y) => new(x._data ^ y._data);
+	}
+
+	
+
+	[StructLayout(LayoutKind.Explicit)]
+	public unsafe struct ByteVector4
 	{
 		[FieldOffset(0)] private readonly uint _data;
+		[FieldOffset(0)] private fixed byte _elements[4];
+
+		[FieldOffset(0)] public byte X;
+		[FieldOffset(1)] public byte Y;
+		[FieldOffset(2)] public byte Z;
+		[FieldOffset(3)] public byte W;
+
+		private ByteVector4(uint data) => _data = data;
+
+		private ByteVector4(byte x, byte y, byte z, byte w)
+		{
+			X = x;
+			Y = y;
+			Z = z;
+			W = w;
+		}
+
+		public byte this[int index]
+		{
+			readonly get => (uint)index < 4 ? _elements[index] : throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be in the range [0, 3].");
+			set => _elements[index] = (uint)index < 4 ? value : throw new ArgumentOutOfRangeException(nameof(index), index, "Index must be in the range [0, 3].");
+		}
+
+
+
+
+		public static implicit operator ByteVector4(uint data) => new(data);
+
+		public static implicit operator uint(ByteVector4 vector) => vector._data;
+
+
+		public static readonly ByteVector4 Zeros = 0u;
+		public static readonly ByteVector4 UnitX = new(1, 0, 0, 0);
+		public static readonly ByteVector4 UnitY = new(0, 1, 0, 0);
+		public static readonly ByteVector4 UnitZ = new(0, 0, 1, 0);
+		public static readonly ByteVector4 UnitW = new(0, 0, 0, 1);
+	}
+
+
+	[StructLayout(LayoutKind.Explicit)]
+	public struct BitMatrix4x8
+	{
+		[FieldOffset(0)] private readonly uint _data;
+		[FieldOffset(0)] private ByteVector4 _bytes;
+		[FieldOffset(0)] private BitVector32 _bits;
+		[FieldOffset(0)] public InlineArray4<BitVector8> Rows;
+
+
+
 
 		/// <summary>
-		/// Blue channel of this BGRA encoded color.
+		/// Access a bit in this matrix by row and column index.
 		/// </summary>
-		[FieldOffset(0)] public byte B;
-		/// <summary>
-		/// Green channel of this BGRA encoded color.
-		/// </summary>
-		[FieldOffset(1)] public byte G;
-		/// <summary>
-		/// Red channel of this BGRA encoded color.
-		/// </summary>
-		[FieldOffset(2)] public byte R;
-		/// <summary>
-		/// Alpha channel of this BGRA encoded color.
-		/// </summary>
-		[FieldOffset(3)] public byte A;
+		/// <param name="i">The row index (0-3).</param>
+		/// <param name="j">The column index (0-7).</param>
+		/// <returns>The bit at the specified row and column.</returns>
+		/// <exception cref="ArgumentOutOfRangeException"></exception>
+		public Bit this[int i, int j]
+		{
+			readonly get => i switch
+			{
+				0 => Rows[0][j],
+				1 => Rows[1][j],
+				2 => Rows[2][j],
+				3 => Rows[3][j],
+				_ => throw new ArgumentOutOfRangeException($"(R:{i}, C:{j})")
+			};
+
+			set
+			{
+				switch (i)
+				{
+					case 0: Rows[0][j] = value; break;
+					case 1: Rows[1][j] = value; break;
+					case 2: Rows[2][j] = value; break;
+					case 3: Rows[3][j] = value; break;
+					default: throw new ArgumentOutOfRangeException($"(R:{i}, C:{j})");
+				}
+			}
+		}
 	}
 }
