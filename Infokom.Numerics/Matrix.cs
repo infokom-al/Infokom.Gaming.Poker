@@ -2,9 +2,17 @@ using Infokom.Numerics.Atomics;
 
 using System.Collections;
 using System.Drawing;
+using System.Numerics;
+using Infokom.Numerics.Extensions;
+using System.Runtime.CompilerServices;
 
 namespace Infokom.Numerics
 {
+
+
+
+
+
 	public interface IMap<TSource, TTarget>
 	{
 		public TTarget this[TSource source] { get; }

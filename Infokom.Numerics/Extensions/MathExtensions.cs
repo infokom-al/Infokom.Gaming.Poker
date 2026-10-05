@@ -1,5 +1,3 @@
-﻿using Infokom.Numerics.Helpers;
-
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -10,7 +8,7 @@ namespace Infokom.Numerics.Extensions
 		extension(Math)
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static T Choose<T>(T n, T k) where T : unmanaged, IBinaryInteger<T> => Func.Choose(n, k);
+			public static T Choose<T>(T n, T k) where T : unmanaged, IBinaryInteger<T> => Functions.choose(n, k);
 
 
 

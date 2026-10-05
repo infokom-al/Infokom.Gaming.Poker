@@ -1,162 +1,56 @@
-using System;
-using System.Collections.Generic;
+//using static Infokom.Numerics.Atomics.FloatingPointConstant;
 using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Numerics;
 
 namespace Infokom.Numerics.Atomics
 {
-	[StructLayout(LayoutKind.Explicit, Size = 4)]
-	public readonly struct RYB
+	public readonly struct RYB : IEquatable<RYB>
 	{
-		[FieldOffset(0)] private readonly byte _r;
-		[FieldOffset(1)] private readonly byte _y;
-		[FieldOffset(2)] private readonly byte _b;
-		[FieldOffset(3)] private readonly byte __;	
+		private readonly byte _value;
 
+		public RYB(byte value) => _value = value;
 
-		public float R => _r / 255f;
-		public float Y => _y / 255f;
-		public float B => _b / 255f;
+		public decimal R => _value <= 85 ? (85m - _value) / 85m : _value < 170 ? 0 : (_value - 170m) / 86m;
 
+		public decimal Y => _value <= 85 ? _value / 85.0m : _value < 170 ? (170m - _value) / 85m : 0m;
 
-		private RYB(byte red, byte yellow, byte blue)
+		public decimal B => _value >= 170 ? (256m - _value) / 86m : 0m;
+
+		public decimal Normalized => _value / 256m;
+
+		public static RYB FromNormalized(decimal value)
 		{
-			_r = red;
-			_y = yellow;
-			_b = blue;
+			value = Math.Clamp(value, 0, 1);
+
+			if (value == 1m)
+				return new RYB(0);
+
+			return new RYB((byte)(value * 256m));
 		}
 
-
-
-
-
-
-		public override string ToString() => $"RYB Byte: ({_r}, {_y}, {_b}) | Float: ({R:F2}, {Y:F2}, {B:F2})";
-
-
-
-
-
-		public static readonly RYB UnitR = new(0xFF, 0x00, 0x00);
-		public static readonly RYB UnitY = new(0x00, 0xFF, 0x00);
-		public static readonly RYB UnitB = new(0x00, 0x00, 0xFF);
-
-
-
-
-
-
-
-
-
-
-
-
-
-		/// <summary>
-		/// Konverton një ngjyrë standarde RGB në RYB (0-255)
-		/// </summary>
-		public static RYB From(Color rgbColor)
+		public Color ToColor()
 		{
-			float r = rgbColor.R / 255f;
-			float g = rgbColor.G / 255f;
-			float b = rgbColor.B / 255f;
+			int r = (int)((R + Y) * 255m);
+			int g = (int)(Y * 255m);
+			int b = (int)(B * 255m);
 
-			// 1. Hiqet pjesa e bardhë
-			float w = Math.Min(r, Math.Min(g, b));
-			r -= w;
-			g -= w;
-			b -= w;
-
-			float maxGreen = Math.Max(r, Math.Max(g, b));
-
-			// 2. Nxirret e verdha
-			float y = Math.Min(r, g);
-			r -= y;
-			g -= y;
-
-			if (b > 0 && g > 0)
-			{
-				b /= 2f;
-				g /= 2f;
-			}
-
-			y += g;
-			b += g;
-
-			// 3. Normalizimi
-			float maxRyb = Math.Max(r, Math.Max(y, b));
-			if (maxRyb > 0 && maxGreen > 0)
-			{
-				float factor = maxGreen / maxRyb;
-				r *= factor;
-				y *= factor;
-				b *= factor;
-			}
-
-			// 4. Rikthehet pjesa e bardhë
-			r += w;
-			y += w;
-			b += w;
-
-			// Kthehen në byte (0-255) duke i rrumbullakosur saktë
-			return new RYB(
-			    (byte)Math.Clamp(Math.Round(r * 255f), 0, 255),
-			    (byte)Math.Clamp(Math.Round(y * 255f), 0, 255),
-			    (byte)Math.Clamp(Math.Round(b * 255f), 0, 255)
-			);
+			return Color.FromArgb(r, g, b);
 		}
 
-		/// <summary>
-		/// Konverton ngjyrën RYB mbrapsht në RGB standarde
-		/// </summary>
-		public Color ToRgb()
-		{
-			// Përdorim vetitë float për llogaritjen
-			float r = R;
-			float y = Y;
-			float b = B;
+		public bool Equals(RYB other)
+			=> _value == other._value;
 
-			float w = Math.Min(r, Math.Min(y, b));
-			r -= w;
-			y -= w;
-			b -= w;
+		public override bool Equals(object obj)
+			=> obj is RYB other && Equals(other);
 
-			float maxRyb = Math.Max(r, Math.Max(y, b));
+		public override int GetHashCode()
+			=> _value;
 
-			float g = Math.Min(y, b);
-			y -= g;
-			b -= g;
+		public static bool operator ==(RYB left, RYB right)
+			=> left._value == right._value;
 
-			if (b > 0 && g > 0)
-			{
-				b *= 2.0f;
-				g *= 2.0f;
-			}
-
-			r += y;
-			g += y;
-
-			float maxRgb = Math.Max(r, Math.Max(g, b));
-			if (maxRgb > 0 && maxRyb > 0)
-			{
-				float factor = maxRyb / maxRgb;
-				r *= factor;
-				g *= factor;
-				b *= factor;
-			}
-
-			r += w;
-			g += w;
-			b += w;
-
-			return Color.FromArgb(
-			    (int)Math.Clamp(Math.Round(r * 255f), 0, 255),
-			    (int)Math.Clamp(Math.Round(g * 255f), 0, 255),
-			    (int)Math.Clamp(Math.Round(b * 255f), 0, 255)
-			);
-		}
-
+		public static bool operator !=(RYB left, RYB right)
+			=> left._value != right._value;
 	}
+
 }

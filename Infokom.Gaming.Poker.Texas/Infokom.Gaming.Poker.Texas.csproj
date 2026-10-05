@@ -17,6 +17,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="Equity\GTO.Range.Rows.cs" />
+	  <None Include="GTO.Range.Rows.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="MediatR" Version="14.2.0" />
 	</ItemGroup>
 </Project>

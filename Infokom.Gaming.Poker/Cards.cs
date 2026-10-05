@@ -7,23 +7,7 @@ namespace Infokom.Gaming.Poker
 {
 	public static class Cards
 	{
-		public static CardSet Select(Func<Card, bool> source)
-		{
-			var collection = CardSet.Φ;
-			foreach (var r in RankSet.Ω.Order())
-			{
-				foreach (var s in SuitSet.Ω.Order())
-				{
-					var c = Card.Of(r, s);
-					if (source(c))
-						collection |= (CardSet)(1ul << c);
-				}
-			}
-			return collection;
-		}
-
-
-
+		
 
 
 
@@ -130,6 +114,10 @@ namespace Infokom.Gaming.Poker
 				card = r * s;
 				return true;
 			}
+
+
+
+
 		}
 
 		extension(Card source)
@@ -160,22 +148,6 @@ namespace Infokom.Gaming.Poker
 				(ρ, σ) = ((Rank)(sbyte)((sbyte)source % 16), (Suit)(sbyte)(1u << ((sbyte)source / 16)));
 			}
 		}
-
-
-
-
-		extension(BitMap<ulong, Card> source)
-		{
-			public void Deconstruct(out BitMap<ushort, Rank> s, out BitMap<ushort, Rank> d, out BitMap<ushort, Rank> c, out BitMap<ushort, Rank> h)
-			{
-				s = (BitMap<ushort, Rank>)((ushort)(((ulong)source) & 0x7FFCul));
-				d = (BitMap<ushort, Rank>)((ushort)(((ulong)source >> 16) & 0x7FFCul));
-				c = (BitMap<ushort, Rank>)((ushort)(((ulong)source >> 32) & 0x7FFCul));
-				h = (BitMap<ushort, Rank>)((ushort)(((ulong)source >> 48) & 0x7FFCul));
-			}
-		}
-
-
 
 
 		extension<T>(T) where T : unmanaged, IShiftOperators<T, int, T>

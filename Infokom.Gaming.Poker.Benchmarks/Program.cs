@@ -1,8 +1,8 @@
-﻿namespace Infokom.Gaming.Poker.Benchmarks
+namespace Infokom.Gaming.Poker.Benchmarks
 {
-	internal class Program
+	internal static class Program
 	{
-		static void Main(string[] args)
+		public static void Main()
 		{
 			Console.WriteLine("Hello, World!");
 		}

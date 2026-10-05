@@ -1,6 +1,11 @@
 using Infokom.Gaming.Poker.Texas;
+using Infokom.Gaming.Poker.Texas.CLI;
+using Infokom.Gaming.Poker.Texas.Estimators;
+using Infokom.Numerics.Extensions;
 
 using Spectre.Console;
+
+using static Infokom.Gaming.Poker.Texas.GTO;
 
 namespace TexasRangeCalc
 {
@@ -11,20 +16,31 @@ namespace TexasRangeCalc
 			AnsiConsole.Clear();
 		}
 
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
-			PrintIntro();
+			AnsiConsole.GTO().Heatmap(1).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(2).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(3).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(4).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(5).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(6).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(7).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(8).Generator().Generate().Print();
+			AnsiConsole.GTO().Heatmap(9).Generator().Generate().Print();
 
-			if (args.Length > 0)
-			{
-				EstimateCli(args);
-				return;
-			}
 
-			EstimateInteractive();
+			//PrintIntro();
+
+			//if (args.Length > 0)
+			//{
+			//	await EstimateCliAsync(args);
+			//	return;
+			//}
+
+			//await EstimateInteractive();
 		}
 
-		private static void EstimateCli(string[] args)
+		private static async Task EstimateCliAsync(string[] args)
 		{
 			int i = 0;
 
@@ -63,17 +79,17 @@ namespace TexasRangeCalc
 				}
 			}
 
-			RunEstimate(rangeArgs);
+			await RunEstimate(rangeArgs);
 		}
 
-		private static void EstimateInteractive()
+		private static async Task EstimateInteractive()
 		{
 			AnsiConsole.MarkupLine("[yellow]Interactive mode[/]");
 			AnsiConsole.MarkupLine("[grey]Type 'exit' at any prompt to quit.[/]");
 			AnsiConsole.WriteLine();
 
 			int playerCount = ReadInt($"Players {Markup.Escape("(2..10)")}: ", 2, 10, null, out bool cancelled);
-			
+
 			if (cancelled) return;
 
 			var rangeArgs = new List<string>(playerCount);
@@ -81,7 +97,7 @@ namespace TexasRangeCalc
 			for (int p = 0; p < playerCount; p++)
 			{
 				string range = ReadText($"Range {p}: ", allowEmpty: false, out cancelled);
-				
+
 				if (cancelled) return;
 
 				rangeArgs.Add(range);
@@ -89,10 +105,10 @@ namespace TexasRangeCalc
 
 			if (cancelled) return;
 
-			RunEstimate(rangeArgs);
+			await RunEstimate(rangeArgs);
 		}
 
-		private static void RunEstimate(IReadOnlyList<string> rangeArgs)
+		private static async Task RunEstimate(IReadOnlyList<string> rangeArgs)
 		{
 			try
 			{
@@ -101,10 +117,10 @@ namespace TexasRangeCalc
 				for (int p = 0; p < rangeArgs.Count; p++)
 					ranges[p] = GTO.Range.Parse(rangeArgs[p]);
 
-				var request = Equity.Estimation.Request.Create(ranges);
+				var request = MonteCarloEstimator.Request.Create(ranges);
 
 				var sw = System.Diagnostics.Stopwatch.StartNew();
-				var result = Equity.Estimation.EstimateMonteCarlo(request);
+				var result = await MonteCarloEstimator.Handler.Handle(request, default);
 				sw.Stop();
 
 				RenderResult(result, rangeArgs, sw.Elapsed);
@@ -115,18 +131,18 @@ namespace TexasRangeCalc
 			}
 		}
 
-		private static void RenderResult(Equity.Estimation result, IReadOnlyList<string> rangeArgs, TimeSpan elapsed)
+		private static void RenderResult(MonteCarloEstimator.Response result, IReadOnlyList<string> rangeArgs, TimeSpan elapsed)
 		{
 			AnsiConsole.Write(new Rule("[yellow]poker-equity[/]").RuleStyle("grey").LeftJustified());
-			
+
 
 			var summary = new Grid();
 			_ = summary.AddColumn(new GridColumn().NoWrap());
 			_ = summary.AddColumn();
 
-			_ = summary.AddRow("[grey]Players[/]", $"[white]{result.PlayerCount}[/]");
+			_ = summary.AddRow("[grey]Players[/]", $"[white]{result.LitigantCount}[/]");
 			_ = summary.AddRow("[grey]Mode[/]", "[white]MonteCarlo[/]");
-			_ = summary.AddRow("[grey]Games[/]", $"[white]{result.Size:N0}[/]");
+			_ = summary.AddRow("[grey]Games[/]", $"[white]{result.TrialCount:N0}[/]");
 			_ = summary.AddRow("[grey]Elapsed[/]", $"[white]{elapsed.TotalMilliseconds:N0} ms[/]");
 
 			AnsiConsole.Write(
@@ -149,13 +165,13 @@ namespace TexasRangeCalc
 			_ = resultTable.AddColumn(new TableColumn("Wins").RightAligned());
 			_ = resultTable.AddColumn(new TableColumn("Win Rate").RightAligned());
 
-			for (int p = 0; p < result.PlayerCount; p++)
+			for (int p = 0; p < result.LitigantCount; p++)
 			{
 				double equity = result.WinRateOf(p);
 
 				_ = resultTable.AddRow(
 					new Markup($"[aqua]{p}[/]"),
-					new Text($"{result.Wins[p]:N0}"),
+					new Text($"{result.WinRateOf(p):N0}"),
 					new Markup($"[bold green]{equity:P4}[/]"));
 			}
 
@@ -182,7 +198,7 @@ namespace TexasRangeCalc
 
 			for (int p = 0; p < result.PlayerCount; p++)
 				_ = chart.AddItem($"P{p}", Math.Round(result.WinRateOf(p) * 100.0), colors[p % colors.Length]);
-			
+
 			chart.ValueFormatter = (value, _) => $"{value:N1}%";
 
 			AnsiConsole.Write(chart);
@@ -281,5 +297,13 @@ namespace TexasRangeCalc
 		}
 
 		private static bool IsOption(string arg) => arg.StartsWith('-') || arg.StartsWith('/');
+
+
+
+
+
+
+
 	}
 }
+

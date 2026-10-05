@@ -1,3 +1,5 @@
+![Alt Text](https://github.com/infokom-al/Infokom.Gaming.Poker/blob/dev/GTO%20Heatmap.gif?raw=true)
+
 # Infokom.Gaming.Poker
 
 A .NET 11 poker toolkit centered on Texas Hold'em hand, range, and equity evaluation.

@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 
@@ -90,7 +90,7 @@ namespace Infokom.Numerics.Atomics
 	/// <param name="Y"></param>
 	/// <param name="Z"></param>
 	[StructLayout(LayoutKind.Sequential)]
-	public readonly record struct Point<Tx, Ty, Tz>(Tx X, Ty Y, Tz Z) where Tx : unmanaged, INumber<Tx> where Ty : unmanaged, INumber<Ty> where Tz : unmanaged, INumber<Tz>
+	public record struct Point<Tx, Ty, Tz>(Tx X, Ty Y, Tz Z) where Tx : unmanaged, INumber<Tx> where Ty : unmanaged, INumber<Ty> where Tz : unmanaged, INumber<Tz>
 	{
 		public static implicit operator Point<Tx, Ty, Tz>(ValueTuple<Tx, Ty, Tz> source) => new(source.Item1, source.Item2, source.Item3);
 	}
@@ -129,6 +129,15 @@ namespace Infokom.Numerics.Atomics
 			public static Point<T, T, T, T> UnitY => new(T.Zero, T.One, T.Zero, T.Zero);
 			public static Point<T, T, T, T> UnitZ => new(T.Zero, T.Zero, T.One, T.Zero);
 			public static Point<T, T, T, T> UnitW => new(T.Zero, T.Zero, T.Zero, T.One);
+
+
+			public static Point<T, T, T, T> operator *(Point<T, T, T, T> p, T scalar) => new(p.X * scalar, p.Y * scalar, p.Z * scalar, p.W * scalar);
+			public static Point<T, T, T, T> operator /(Point<T, T, T, T> p, T scalar) => new(p.X / scalar, p.Y / scalar, p.Z / scalar, p.W / scalar);
+
+
+			public static Point<T, T, T, T> operator +(Point<T, T, T, T> p1, Point<T, T, T, T> p2) => new(p1.X + p2.X, p1.Y + p2.Y, p1.Z + p2.Z, p1.W + p2.W);
+
+			public static Point<T, T, T, T> operator -(Point<T, T, T, T> p1, Point<T, T, T, T> p2) => new(p1.X - p2.X, p1.Y - p2.Y, p1.Z - p2.Z, p1.W - p2.W);
 		}
 	}
 	#endregion	

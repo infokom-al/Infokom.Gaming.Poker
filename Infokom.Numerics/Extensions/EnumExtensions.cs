@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace Infokom.Numerics.Extensions
 {
@@ -18,6 +18,5 @@ namespace Infokom.Numerics.Extensions
 
 			public TTarget ToBinary<TTarget>() where TTarget : unmanaged, IBinaryInteger<TTarget> => (TTarget)Enum.ToObject(typeof(TTarget), source);
 		}
-
 	}
 }

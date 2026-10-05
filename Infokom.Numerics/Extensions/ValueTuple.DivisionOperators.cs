@@ -1,7 +1,7 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace Infokom.Numerics.Operators
+namespace Infokom.Numerics.Extensions
 {
 	public static partial class DivisionOperators
 	{
@@ -20,7 +20,7 @@ namespace Infokom.Numerics.Operators
 		extension<T>(ValueTuple<T, T, T>) where T : unmanaged, IDivisionOperators<T, T, T>
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			public static ValueTuple<T, T, T> operator /(ValueTuple<T, T, T> a, T b) => ValueTuple.Create(a.Item1 / b, a.Item2 / b, a.Item3 / b);
+			public static ValueTuple<T, T, T> operator /(in ValueTuple<T, T, T> a, T b) => ValueTuple.Create(a.Item1 / b, a.Item2 / b, a.Item3 / b);
 		}
 
 		extension<T>(ValueTuple<T, T, T, T>) where T : unmanaged, IDivisionOperators<T, T, T>

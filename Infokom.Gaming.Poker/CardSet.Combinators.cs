@@ -119,10 +119,23 @@ namespace Infokom.Gaming.Poker
 		}
 
 		/// <summary>
-		/// Get the <paramref name="k"/>-cards combinations from this <see cref="CardSet"/>.
+		/// Get a collection of all possible combinations of a specific number of cards from this <see cref="CardSet">set</see>.
 		/// </summary>
-		/// <param name="k"></param>
-		/// <returns></returns>
+		/// <param name="k">The number of cards to choose. </param>
+		/// <returns>A <see cref="Combinator"/> that can be used to enumerate all possible combinations of <paramref name="k"/> cards from this <see cref="CardSet"/>.</returns>
 		public Combinator Choose(int k) => new(this, k);
+
+		/// <summary>
+		/// Get a random combination of a specific number of elements from this <see cref="CardSet"></see>.
+		/// </summary>
+		/// <param name="k">The number of cards to choose randomly.</param>
+		/// <returns>A <see cref="CardSet">set</see> of <paramref name="k"/> elements chosen randomly from this <see cref="CardSet">set</see>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public CardSet ChooseRandom(int k)
+		{
+			var bits = this._bits.BitIsolateRandom(k);
+
+			return Unsafe.As<ulong, CardSet>(ref bits);
+		}
 	}
 }
